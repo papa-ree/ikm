@@ -1,0 +1,42 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('ikm_batches', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+
+            // Informasi batch / file upload
+            $table->string('nama');                         // nama batch, diisi user (contoh: "IKM TW1 2025")
+            $table->tinyInteger('triwulan');                // 1, 2, 3, atau 4
+            $table->smallInteger('tahun');                  // contoh: 2025
+            $table->string('nama_file');                    // nama file asli
+            $table->string('path_file');                    // path storage file Excel
+
+            // Statistik import
+            $table->unsignedInteger('jumlah_opd')->default(0); // jumlah baris OPD berhasil diimport
+
+            // Status pemrosesan
+            $table->enum('status', ['draft', 'diproses', 'selesai', 'gagal'])->default('draft');
+            $table->text('catatan')->nullable();             // error log atau catatan admin
+
+            // Relasi ke users
+            $table->foreignId('uploaded_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('approved_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->timestamp('approved_at')->nullable();
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('ikm_batches');
+    }
+};

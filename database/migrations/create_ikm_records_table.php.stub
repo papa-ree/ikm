@@ -1,0 +1,77 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('ikm_records', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+
+            // Relasi ke batch
+            $table->uuid('ikm_batch_id');
+            $table->foreign('ikm_batch_id')->references('id')->on('ikm_batches')->cascadeOnDelete();
+
+            // Identitas OPD
+            $table->string('nama_opd');                     // nama OPD/unit layanan
+
+            // Periode (diambil dari batch)
+            $table->tinyInteger('triwulan');
+            $table->smallInteger('tahun');
+
+            // Data responden
+            $table->unsignedInteger('populasi')->nullable();
+            $table->unsignedInteger('sampel')->nullable();
+
+            // NRR per unsur (9 unsur PermenPAN-RB 14/2017)
+            $table->decimal('nrr_u1', 5, 2)->nullable();   // Persyaratan
+            $table->decimal('nrr_u2', 5, 2)->nullable();   // Sistem, Mekanisme, dan Prosedur
+            $table->decimal('nrr_u3', 5, 2)->nullable();   // Waktu Penyelesaian
+            $table->decimal('nrr_u4', 5, 2)->nullable();   // Biaya/Tarif
+            $table->decimal('nrr_u5', 5, 2)->nullable();   // Produk Spesifikasi Jenis Pelayanan
+            $table->decimal('nrr_u6', 5, 2)->nullable();   // Kompetensi Pelaksana
+            $table->decimal('nrr_u7', 5, 2)->nullable();   // Perilaku Pelaksana
+            $table->decimal('nrr_u8', 5, 2)->nullable();   // Penanganan Pengaduan, Saran, dan Masukan
+            $table->decimal('nrr_u9', 5, 2)->nullable();   // Sarana dan Prasarana
+
+            // Demografi — Jenis Kelamin
+            $table->unsignedSmallInteger('dem_laki')->default(0);
+            $table->unsignedSmallInteger('dem_perempuan')->default(0);
+
+            // Demografi — Pendidikan
+            $table->unsignedSmallInteger('dem_sd')->default(0);
+            $table->unsignedSmallInteger('dem_sltp')->default(0);
+            $table->unsignedSmallInteger('dem_slta')->default(0);
+            $table->unsignedSmallInteger('dem_diploma')->default(0);
+            $table->unsignedSmallInteger('dem_s1')->default(0);
+            $table->unsignedSmallInteger('dem_s2')->default(0);
+            $table->unsignedSmallInteger('dem_s3')->default(0);
+
+            // Demografi — Pekerjaan
+            $table->unsignedSmallInteger('dem_pns')->default(0);
+            $table->unsignedSmallInteger('dem_tni_polri')->default(0);
+            $table->unsignedSmallInteger('dem_swasta')->default(0);
+            $table->unsignedSmallInteger('dem_wiraswasta')->default(0);
+            $table->unsignedSmallInteger('dem_pelajar')->default(0);
+            $table->unsignedSmallInteger('dem_petani')->default(0);
+            $table->unsignedSmallInteger('dem_lainnya')->default(0);
+
+            // Hasil kalkulasi
+            $table->decimal('nrr_tertimbang', 10, 4)->nullable(); // jumlah NRR × bobot
+            $table->decimal('nilai_ikm', 6, 2)->nullable();       // NRR tertimbang × 25
+            $table->char('kategori', 1)->nullable();              // A/B/C/D
+            $table->string('label_kategori', 50)->nullable();     // "Sangat Baik", dll
+
+            $table->timestamps();
+            $table->softDeletes();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('ikm_records');
+    }
+};

@@ -1,0 +1,27 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('ikm_settings', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+
+            $table->string('key')->unique();    // contoh: 'kategori_a_min'
+            $table->string('value');            // nilai setting
+            $table->string('label');            // label tampilan
+            $table->string('group')->default('kategori'); // grouping di UI
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('ikm_settings');
+    }
+};
