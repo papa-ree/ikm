@@ -13,8 +13,9 @@ use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Bale\Cms\Services\TenantConnectionService;
 
-#[Layout('ikm::layouts.app')]
+#[Layout('cms::layouts.app')]
 #[Title('Detail Batch IKM')]
 class IkmDetail extends Component
 {
@@ -23,15 +24,17 @@ class IkmDetail extends Component
     public IkmBatch $batch;
 
     #[Url]
-    public string $search    = '';
+    public string $search = '';
 
     #[Url]
-    public string $sortDir   = 'desc';
+    public string $sortDir = 'desc';
 
-    public function mount(IkmBatch $batch): void
+    public function mount(string $id): void
     {
-        $this->authorize('view', $batch);
-        $this->batch = $batch;
+        TenantConnectionService::ensureActive();
+
+        $this->batch = IkmBatch::find($id);
+        $this->authorize('view', $this->batch);
     }
 
     public function toggleSort(): void
@@ -47,6 +50,7 @@ class IkmDetail extends Component
 
     public function recalculate(IkmCalculatorService $calculator): void
     {
+        TenantConnectionService::ensureActive();
         $this->authorize('approve', $this->batch);
         $calculator->recalculateBatch($this->batch);
         session()->flash('success', 'Kalkulasi ulang berhasil.');
@@ -54,6 +58,7 @@ class IkmDetail extends Component
 
     public function exportExcel(): StreamedResponse
     {
+        TenantConnectionService::ensureActive();
         $this->authorize('export', $this->batch);
 
         $records = IkmRecord::query()
@@ -68,18 +73,38 @@ class IkmDetail extends Component
 
             // Header CSV
             fputcsv($handle, [
-                'No','Nama OPD','U1','U2','U3','U4','U5','U6','U7','U8','U9',
-                'NRR Tertimbang','Nilai IKM','Kategori','Label Kategori',
-                'Populasi','Sampel',
+                'No',
+                'Nama OPD',
+                'U1',
+                'U2',
+                'U3',
+                'U4',
+                'U5',
+                'U6',
+                'U7',
+                'U8',
+                'U9',
+                'NRR Tertimbang',
+                'Nilai IKM',
+                'Kategori',
+                'Label Kategori',
+                'Populasi',
+                'Sampel',
             ]);
 
             foreach ($records as $i => $rec) {
                 fputcsv($handle, [
                     $i + 1,
                     $rec->nama_opd,
-                    $rec->nrr_u1, $rec->nrr_u2, $rec->nrr_u3,
-                    $rec->nrr_u4, $rec->nrr_u5, $rec->nrr_u6,
-                    $rec->nrr_u7, $rec->nrr_u8, $rec->nrr_u9,
+                    $rec->nrr_u1,
+                    $rec->nrr_u2,
+                    $rec->nrr_u3,
+                    $rec->nrr_u4,
+                    $rec->nrr_u5,
+                    $rec->nrr_u6,
+                    $rec->nrr_u7,
+                    $rec->nrr_u8,
+                    $rec->nrr_u9,
                     $rec->nrr_tertimbang,
                     $rec->nilai_ikm,
                     $rec->kategori,
@@ -95,9 +120,13 @@ class IkmDetail extends Component
 
     public function render()
     {
+        TenantConnectionService::ensureActive();
+        
         $records = IkmRecord::query()
             ->where('ikm_batch_id', $this->batch->id)
-            ->when($this->search, fn ($q) =>
+            ->when(
+                $this->search,
+                fn($q) =>
                 $q->where('nama_opd', 'like', "%{$this->search}%")
             )
             ->orderBy('nilai_ikm', $this->sortDir)
@@ -113,31 +142,35 @@ class IkmDetail extends Component
             'Perempuan' => $allRecords->sum('dem_perempuan'),
         ];
         $demPendidikan = [
-            'SD'      => $allRecords->sum('dem_sd'),
-            'SLTP'    => $allRecords->sum('dem_sltp'),
-            'SLTA'    => $allRecords->sum('dem_slta'),
+            'SD' => $allRecords->sum('dem_sd'),
+            'SLTP' => $allRecords->sum('dem_sltp'),
+            'SLTA' => $allRecords->sum('dem_slta'),
             'Diploma' => $allRecords->sum('dem_diploma'),
-            'S1'      => $allRecords->sum('dem_s1'),
-            'S2'      => $allRecords->sum('dem_s2'),
-            'S3'      => $allRecords->sum('dem_s3'),
+            'S1' => $allRecords->sum('dem_s1'),
+            'S2' => $allRecords->sum('dem_s2'),
+            'S3' => $allRecords->sum('dem_s3'),
         ];
         $demPekerjaan = [
-            'PNS/ASN'    => $allRecords->sum('dem_pns'),
-            'TNI/Polri'  => $allRecords->sum('dem_tni_polri'),
-            'Swasta'     => $allRecords->sum('dem_swasta'),
+            'PNS/ASN' => $allRecords->sum('dem_pns'),
+            'TNI/Polri' => $allRecords->sum('dem_tni_polri'),
+            'Swasta' => $allRecords->sum('dem_swasta'),
             'Wiraswasta' => $allRecords->sum('dem_wiraswasta'),
-            'Pelajar'    => $allRecords->sum('dem_pelajar'),
-            'Petani'     => $allRecords->sum('dem_petani'),
-            'Lainnya'    => $allRecords->sum('dem_lainnya'),
+            'Pelajar' => $allRecords->sum('dem_pelajar'),
+            'Petani' => $allRecords->sum('dem_petani'),
+            'Lainnya' => $allRecords->sum('dem_lainnya'),
         ];
 
-        $canExport      = Auth::user()?->can(IkmPermissions::EXPORT_IKM);
+        $canExport = Auth::user()?->can(IkmPermissions::EXPORT_IKM);
         $canRecalculate = Auth::user()?->can(IkmPermissions::APPROVE_IKM);
 
-        return view('ikm::livewire.ikm-detail', compact(
+        return view('ikm::livewire.detail', compact(
             'records',
-            'totalSampel', 'demJK', 'demPendidikan', 'demPekerjaan',
-            'canExport', 'canRecalculate',
+            'totalSampel',
+            'demJK',
+            'demPendidikan',
+            'demPekerjaan',
+            'canExport',
+            'canRecalculate',
         ));
     }
 }

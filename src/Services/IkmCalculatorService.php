@@ -5,6 +5,7 @@ namespace Bale\Ikm\Services;
 use Bale\Ikm\Models\IkmBatch;
 use Bale\Ikm\Models\IkmRecord;
 use Bale\Ikm\Models\IkmSetting;
+use Bale\Cms\Services\TenantConnectionService;
 
 /**
  * Service kalkulasi IKM sesuai PermenPAN-RB No. 14 Tahun 2017.
@@ -83,6 +84,7 @@ class IkmCalculatorService
      */
     public function recalculateBatch(IkmBatch $batch): void
     {
+        TenantConnectionService::ensureActive();
         $batch->records()->each(function (IkmRecord $record) {
             $data   = $record->toArray();
             $result = $this->calculate($data);
@@ -108,6 +110,7 @@ class IkmCalculatorService
      */
     public function determineKategori(float $nilaiIkm): array
     {
+        TenantConnectionService::ensureActive();
         $table = $this->buildKategoriTable();
 
         foreach ($table as $kode => $batas) {

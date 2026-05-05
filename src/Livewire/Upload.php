@@ -12,8 +12,9 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
+use Bale\Cms\Services\TenantConnectionService;
 
-#[Layout('ikm::layouts.app')]
+#[Layout('cms::layouts.app')]
 #[Title('Upload IKM')]
 class Upload extends Component
 {
@@ -35,8 +36,9 @@ class Upload extends Component
 
     public function mount(): void
     {
-        $this->tahun     = (int) now()->format('Y');
-        $this->triwulan  = (int) ceil((int) now()->format('n') / 3);
+        TenantConnectionService::ensureActive();
+        $this->tahun = (int) now()->format('Y');
+        $this->triwulan = (int) ceil((int) now()->format('n') / 3);
     }
 
     public function updatedFile(): void
@@ -46,6 +48,7 @@ class Upload extends Component
 
     public function save(IkmImportService $importService): void
     {
+        TenantConnectionService::ensureActive();
         Gate::authorize('create', IkmBatch::class);
 
         $this->validate();
@@ -58,13 +61,13 @@ class Upload extends Component
 
             // Buat batch dengan status awal 'diproses'
             $batch = IkmBatch::create([
-                'nama'        => $this->nama,
-                'triwulan'    => $this->triwulan,
-                'tahun'       => $this->tahun,
-                'nama_file'   => $this->file->getClientOriginalName(),
-                'path_file'   => $path,
-                'status'      => 'diproses',
-                'uploaded_by' => Auth::id(),
+                'nama' => $this->nama,
+                'triwulan' => $this->triwulan,
+                'tahun' => $this->tahun,
+                'nama_file' => $this->file->getClientOriginalName(),
+                'path_file' => $path,
+                'status' => 'diproses',
+                'uploaded_by' => Auth::user()->uuid,
             ]);
 
             // Jalankan import langsung (gunakan queue di produksi via observer/event)

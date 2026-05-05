@@ -8,8 +8,9 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Bale\Cms\Services\TenantConnectionService;
 
-#[Layout('ikm::layouts.app')]
+#[Layout('cms::layouts.app')]
 #[Title('Pengaturan Kategori IKM')]
 class Settings extends Component
 {
@@ -18,12 +19,14 @@ class Settings extends Component
 
     public function mount(): void
     {
+        TenantConnectionService::ensureActive();
         abort_unless(Auth::user()?->can(IkmPermissions::MANAGE_SETTINGS), 403);
         $this->loadSettings();
     }
 
     public function save(): void
     {
+        TenantConnectionService::ensureActive();
         abort_unless(Auth::user()?->can(IkmPermissions::MANAGE_SETTINGS), 403);
 
         $this->validate($this->rules());
@@ -41,6 +44,7 @@ class Settings extends Component
 
     public function resetToDefault(): void
     {
+        TenantConnectionService::ensureActive();
         abort_unless(Auth::user()?->can(IkmPermissions::MANAGE_SETTINGS), 403);
 
         $defaults = config('ikm.kategori', []);

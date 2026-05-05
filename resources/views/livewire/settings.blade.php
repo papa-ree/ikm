@@ -1,57 +1,104 @@
-<div class="max-w-4xl mx-auto space-y-8">
-    <div class="flex items-center justify-between">
-        <div>
-            <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Pengaturan Kategori IKM</h1>
-            <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Konfigurasi rentang nilai dan label kategori IKM.</p>
+<div class="max-w-5xl mx-auto space-y-6">
+    {{-- Hero Header --}}
+    <div class="relative overflow-hidden p-8 text-white rounded-2xl shadow-xl"
+         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24"></div>
+
+        <div class="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+            <div>
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="p-3 bg-white/20 backdrop-blur-md rounded-xl">
+                        <x-lucide-settings-2 class="w-8 h-8 text-white" />
+                    </div>
+                    <h1 class="text-3xl font-bold text-white md:text-4xl">Pengaturan IKM</h1>
+                </div>
+                <p class="max-w-2xl text-white/90 text-lg">Konfigurasi ambang batas nilai dan label klasifikasi IKM sesuai standar PermenPAN-RB 14/2017.</p>
+            </div>
+            <div class="shrink-0">
+                <button wire:click="resetToDefault"
+                    wire:confirm="Kembalikan semua pengaturan ke standar PermenPAN-RB 14/2017? Data yang sudah tersimpan akan diubah."
+                    class="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg bg-white/20 backdrop-blur-md border border-white/30 text-white font-semibold text-sm hover:bg-white/30 transition-all">
+                    <x-lucide-refresh-cw class="w-4 h-4" />
+                    Reset ke Default
+                </button>
+            </div>
         </div>
-        
-        <button wire:click="resetToDefault" wire:confirm="Kembalikan semua pengaturan ke standar PermenPAN-RB 14/2017?" class="text-sm font-bold text-primary-600 hover:text-primary-700 flex items-center gap-2 transition-all">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-            Reset ke Default
-        </button>
     </div>
 
+    {{-- Form --}}
     <form wire:submit="save" class="space-y-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6" data-aos="fade-up" data-aos-delay="100">
             @foreach($kodeList as $kode)
-            <div class="p-6 rounded-[32px] bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
-                <div class="flex items-center justify-between">
-                    <span class="w-10 h-10 flex items-center justify-center rounded-2xl bg-slate-50 dark:bg-slate-800 text-lg font-black text-slate-900 dark:text-white border border-slate-100 dark:border-slate-700 shadow-sm">
+            <div class="group p-6 transition-all duration-300 bg-white border border-gray-100 shadow-md dark:bg-gray-800 rounded-2xl hover:shadow-xl dark:border-gray-700 hover:-translate-y-1">
+                {{-- Category Header --}}
+                <div class="flex items-center gap-4 mb-6 pb-4 border-b border-gray-100 dark:border-gray-700">
+                    <span class="w-12 h-12 flex items-center justify-center rounded-xl bg-linear-to-br from-indigo-500 to-purple-600 text-white text-xl font-bold shadow-lg">
                         {{ $kode }}
                     </span>
-                    <span class="text-[10px] font-black uppercase tracking-widest text-slate-400">KATEGORI</span>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Label Tampilan</label>
-                    <input type="text" wire:model="kategori.{{ $kode }}.label" class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-2.5 text-sm font-bold focus:ring-primary-500 transition-all">
-                    @error("kategori.{$kode}.label") <span class="text-[10px] text-rose-500 mt-1">{{ $message }}</span> @enderror
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Nilai Min</label>
-                        <input type="number" step="0.01" wire:model="kategori.{{ $kode }}.min" class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-2 text-sm font-black focus:ring-primary-500 transition-all">
-                        @error("kategori.{$kode}.min") <span class="text-[10px] text-rose-500 mt-1">{{ $message }}</span> @enderror
+                        <p class="text-[10px] font-semibold uppercase tracking-[0.25em] text-gray-400">Klasifikasi</p>
+                        <p class="text-sm font-bold text-gray-900 dark:text-white">Kategori {{ $kode }}</p>
                     </div>
+                </div>
+
+                <div class="space-y-4">
+                    {{-- Label Input --}}
                     <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-2">Nilai Max</label>
-                        <input type="number" step="0.01" wire:model="kategori.{{ $kode }}.max" class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-2 text-sm font-black focus:ring-primary-500 transition-all">
-                        @error("kategori.{$kode}.max") <span class="text-[10px] text-rose-500 mt-1">{{ $message }}</span> @enderror
+                        <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                            Label Kualitas Pelayanan
+                        </label>
+                        <x-core::input
+                            type="text"
+                            wire:model="kategori.{{ $kode }}.label"
+                            placeholder="Contoh: Sangat Baik"
+                        />
+                        @error("kategori.{$kode}.label")
+                            <p class="text-xs font-medium text-red-500 mt-1.5">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Values --}}
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Nilai Minimum</label>
+                            <x-core::input
+                                type="number"
+                                step="0.01"
+                                wire:model="kategori.{{ $kode }}.min"
+                                placeholder="0.00"
+                            />
+                            @error("kategori.{$kode}.min")
+                                <p class="text-xs font-medium text-red-500 mt-1.5">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Nilai Maksimum</label>
+                            <x-core::input
+                                type="number"
+                                step="0.01"
+                                wire:model="kategori.{{ $kode }}.max"
+                                placeholder="100.00"
+                            />
+                            @error("kategori.{$kode}.max")
+                                <p class="text-xs font-medium text-red-500 mt-1.5">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
 
-        <div class="flex items-center justify-end">
-            <button type="submit" wire:loading.attr="disabled" class="px-10 py-4 rounded-2xl bg-primary-600 text-white font-black hover:bg-primary-700 transition-all shadow-xl shadow-primary-500/30 flex items-center gap-3">
-                <svg wire:loading class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>SIMPAN PENGATURAN</span>
+        {{-- Submit Action --}}
+        <div class="pt-6 border-t border-gray-100 dark:border-gray-700 flex flex-col items-center gap-4" data-aos="fade-up" data-aos-delay="200">
+            <button type="submit" wire:loading.attr="disabled"
+                class="w-full md:w-auto px-12 py-3 rounded-lg bg-linear-to-r from-purple-600 to-purple-700 text-white font-semibold hover:from-purple-700 hover:to-purple-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md hover:shadow-lg flex items-center justify-center gap-3 text-sm capitalize">
+                <div wire:loading class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                <x-lucide-save wire:loading.remove class="w-4 h-4" />
+                <span>Simpan Perubahan</span>
             </button>
+            <p class="text-xs font-medium text-gray-400">Terakhir diperbarui: {{ now()->format('d M Y, H:i') }}</p>
         </div>
     </form>
 </div>

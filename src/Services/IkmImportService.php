@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Bale\Cms\Services\TenantConnectionService;
 use Throwable;
 
 /**
@@ -38,15 +39,15 @@ class IkmImportService
      *  31 = KATEGORI   (skip)
      */
     protected const COLUMN_MAP = [
-        1  => 'nama_opd',
-        2  => 'nrr_u1',
-        3  => 'nrr_u2',
-        4  => 'nrr_u3',
-        5  => 'nrr_u4',
-        6  => 'nrr_u5',
-        7  => 'nrr_u6',
-        8  => 'nrr_u7',
-        9  => 'nrr_u8',
+        1 => 'nama_opd',
+        2 => 'nrr_u1',
+        3 => 'nrr_u2',
+        4 => 'nrr_u3',
+        5 => 'nrr_u4',
+        6 => 'nrr_u5',
+        7 => 'nrr_u6',
+        8 => 'nrr_u7',
+        9 => 'nrr_u8',
         10 => 'nrr_u9',
         11 => 'dem_laki',
         12 => 'dem_perempuan',
@@ -70,21 +71,41 @@ class IkmImportService
 
     /** Kolom NRR (nilai float, nullable) */
     protected const NRR_COLUMNS = [
-        'nrr_u1','nrr_u2','nrr_u3','nrr_u4','nrr_u5',
-        'nrr_u6','nrr_u7','nrr_u8','nrr_u9',
+        'nrr_u1',
+        'nrr_u2',
+        'nrr_u3',
+        'nrr_u4',
+        'nrr_u5',
+        'nrr_u6',
+        'nrr_u7',
+        'nrr_u8',
+        'nrr_u9',
     ];
 
     /** Kolom demografi (nilai integer, default 0) */
     protected const DEM_COLUMNS = [
-        'dem_laki','dem_perempuan',
-        'dem_sd','dem_sltp','dem_slta','dem_diploma','dem_s1','dem_s2','dem_s3',
-        'dem_pns','dem_tni_polri','dem_swasta','dem_wiraswasta',
-        'dem_pelajar','dem_petani','dem_lainnya',
+        'dem_laki',
+        'dem_perempuan',
+        'dem_sd',
+        'dem_sltp',
+        'dem_slta',
+        'dem_diploma',
+        'dem_s1',
+        'dem_s2',
+        'dem_s3',
+        'dem_pns',
+        'dem_tni_polri',
+        'dem_swasta',
+        'dem_wiraswasta',
+        'dem_pelajar',
+        'dem_petani',
+        'dem_lainnya',
     ];
 
     public function __construct(
         protected IkmCalculatorService $calculator,
-    ) {}
+    ) {
+    }
 
     // ─────────────────────────────────────────────
     // Public API
@@ -98,23 +119,28 @@ class IkmImportService
      */
     public function import(IkmBatch $batch): ImportResult
     {
+        TenantConnectionService::ensureActive();
         // Tandai batch sedang diproses
         $batch->update(['status' => 'diproses']);
 
         $success = 0;
-        $failed  = 0;
-        $errors  = [];
-        $rows    = [];
+        $failed = 0;
+        $errors = [];
+        $rows = [];
 
         try {
-            $filePath = storage_path($batch->path_file);
+            // jika menggunakan s3
+            // $filePath = storage_path($batch->path_file);
 
-            if (! file_exists($filePath)) {
+            // jika livewire storage menggunakan local
+            $filePath = \Illuminate\Support\Facades\Storage::disk('local')->path($batch->path_file);
+
+            if (!file_exists($filePath)) {
                 throw new \RuntimeException("File tidak ditemukan: {$filePath}");
             }
 
             $spreadsheet = IOFactory::load($filePath);
-            $sheet       = $spreadsheet->getActiveSheet();
+            $sheet = $spreadsheet->getActiveSheet();
 
             $dataRows = $this->extractDataRows($sheet);
 
@@ -123,7 +149,7 @@ class IkmImportService
 
                 try {
                     $rowData = $this->mapRowToData($rawRow);
-                    $result  = $this->calculator->calculate($rowData);
+                    $result = $this->calculator->calculate($rowData);
 
                     $rows[] = $this->prepareRecord($result, $batch);
                     $success++;
@@ -131,20 +157,20 @@ class IkmImportService
                     $failed++;
                     $opdName = $rawRow[1] ?? '-';
                     $errors[] = [
-                        'row'     => $rowNumber,
-                        'opd'     => is_string($opdName) ? $opdName : (string) $opdName,
+                        'row' => $rowNumber,
+                        'opd' => is_string($opdName) ? $opdName : (string) $opdName,
                         'message' => $e->getMessage(),
                     ];
 
                     Log::warning("[IKM Import] Baris {$rowNumber} gagal: " . $e->getMessage(), [
                         'batch_id' => $batch->id,
-                        'raw_row'  => $rawRow,
+                        'raw_row' => $rawRow,
                     ]);
                 }
             }
 
             // Bulk insert semua record yang berhasil
-            if (! empty($rows)) {
+            if (!empty($rows)) {
                 IkmRecord::insert($rows);
             }
 
@@ -153,19 +179,21 @@ class IkmImportService
             // Update status batch
             $batch->update([
                 'jumlah_opd' => $success,
-                'status'     => $failed === 0 ? 'selesai' : 'selesai',
-                'catatan'    => $importResult->summary(),
+                'status' => $failed === 0 ? 'selesai' : 'selesai',
+                'catatan' => $importResult->summary(),
             ]);
 
         } catch (Throwable $e) {
-            $importResult = new ImportResult(0, 1, [[
-                'row'     => 0,
-                'opd'     => '-',
-                'message' => 'Fatal: ' . $e->getMessage(),
-            ]]);
+            $importResult = new ImportResult(0, 1, [
+                [
+                    'row' => 0,
+                    'opd' => '-',
+                    'message' => 'Fatal: ' . $e->getMessage(),
+                ]
+            ]);
 
             $batch->update([
-                'status'  => 'gagal',
+                'status' => 'gagal',
                 'catatan' => $importResult->summary(),
             ]);
 
@@ -189,11 +217,11 @@ class IkmImportService
      */
     protected function extractDataRows(Worksheet $sheet): array
     {
-        $data       = [];
+        $data = [];
         $highestRow = $sheet->getHighestDataRow();
 
         for ($rowNum = 3; $rowNum <= $highestRow; $rowNum++) {
-            $no  = $sheet->getCellByColumnAndRow(1, $rowNum)->getValue(); // kolom A (1-based)
+            $no = $sheet->getCellByColumnAndRow(1, $rowNum)->getValue(); // kolom A (1-based)
             $opd = $sheet->getCellByColumnAndRow(2, $rowNum)->getValue(); // kolom B (1-based)
 
             // Stop: baris rekapitulasi (NO = null/kosong dan OPD mengandung "Jumlah")
@@ -202,7 +230,7 @@ class IkmImportService
             }
 
             // Skip: kolom NO kosong atau bukan angka
-            if (empty($no) || ! is_numeric($no)) {
+            if (empty($no) || !is_numeric($no)) {
                 continue;
             }
 
@@ -273,48 +301,48 @@ class IkmImportService
         $now = now();
 
         return [
-            'id'             => (string) Str::uuid(),
-            'ikm_batch_id'   => $batch->id,
-            'nama_opd'       => $result['nama_opd'] ?? null,
-            'triwulan'       => $batch->triwulan,
-            'tahun'          => $batch->tahun,
-            'populasi'       => $result['populasi'] ?? null,
-            'sampel'         => $result['sampel'] ?? null,
+            'id' => (string) Str::uuid(),
+            'ikm_batch_id' => $batch->id,
+            'nama_opd' => $result['nama_opd'] ?? null,
+            'triwulan' => $batch->triwulan,
+            'tahun' => $batch->tahun,
+            'populasi' => $result['populasi'] ?? null,
+            'sampel' => $result['sampel'] ?? null,
             // NRR per unsur
-            'nrr_u1'         => $result['nrr_u1'] ?? null,
-            'nrr_u2'         => $result['nrr_u2'] ?? null,
-            'nrr_u3'         => $result['nrr_u3'] ?? null,
-            'nrr_u4'         => $result['nrr_u4'] ?? null,
-            'nrr_u5'         => $result['nrr_u5'] ?? null,
-            'nrr_u6'         => $result['nrr_u6'] ?? null,
-            'nrr_u7'         => $result['nrr_u7'] ?? null,
-            'nrr_u8'         => $result['nrr_u8'] ?? null,
-            'nrr_u9'         => $result['nrr_u9'] ?? null,
+            'nrr_u1' => $result['nrr_u1'] ?? null,
+            'nrr_u2' => $result['nrr_u2'] ?? null,
+            'nrr_u3' => $result['nrr_u3'] ?? null,
+            'nrr_u4' => $result['nrr_u4'] ?? null,
+            'nrr_u5' => $result['nrr_u5'] ?? null,
+            'nrr_u6' => $result['nrr_u6'] ?? null,
+            'nrr_u7' => $result['nrr_u7'] ?? null,
+            'nrr_u8' => $result['nrr_u8'] ?? null,
+            'nrr_u9' => $result['nrr_u9'] ?? null,
             // Demografi
-            'dem_laki'       => $result['dem_laki'] ?? 0,
-            'dem_perempuan'  => $result['dem_perempuan'] ?? 0,
-            'dem_sd'         => $result['dem_sd'] ?? 0,
-            'dem_sltp'       => $result['dem_sltp'] ?? 0,
-            'dem_slta'       => $result['dem_slta'] ?? 0,
-            'dem_diploma'    => $result['dem_diploma'] ?? 0,
-            'dem_s1'         => $result['dem_s1'] ?? 0,
-            'dem_s2'         => $result['dem_s2'] ?? 0,
-            'dem_s3'         => $result['dem_s3'] ?? 0,
-            'dem_pns'        => $result['dem_pns'] ?? 0,
-            'dem_tni_polri'  => $result['dem_tni_polri'] ?? 0,
-            'dem_swasta'     => $result['dem_swasta'] ?? 0,
+            'dem_laki' => $result['dem_laki'] ?? 0,
+            'dem_perempuan' => $result['dem_perempuan'] ?? 0,
+            'dem_sd' => $result['dem_sd'] ?? 0,
+            'dem_sltp' => $result['dem_sltp'] ?? 0,
+            'dem_slta' => $result['dem_slta'] ?? 0,
+            'dem_diploma' => $result['dem_diploma'] ?? 0,
+            'dem_s1' => $result['dem_s1'] ?? 0,
+            'dem_s2' => $result['dem_s2'] ?? 0,
+            'dem_s3' => $result['dem_s3'] ?? 0,
+            'dem_pns' => $result['dem_pns'] ?? 0,
+            'dem_tni_polri' => $result['dem_tni_polri'] ?? 0,
+            'dem_swasta' => $result['dem_swasta'] ?? 0,
             'dem_wiraswasta' => $result['dem_wiraswasta'] ?? 0,
-            'dem_pelajar'    => $result['dem_pelajar'] ?? 0,
-            'dem_petani'     => $result['dem_petani'] ?? 0,
-            'dem_lainnya'    => $result['dem_lainnya'] ?? 0,
+            'dem_pelajar' => $result['dem_pelajar'] ?? 0,
+            'dem_petani' => $result['dem_petani'] ?? 0,
+            'dem_lainnya' => $result['dem_lainnya'] ?? 0,
             // Hasil kalkulasi
             'nrr_tertimbang' => $result['nrr_tertimbang'] ?? null,
-            'nilai_ikm'      => $result['nilai_ikm'] ?? null,
-            'kategori'       => $result['kategori'] ?? null,
+            'nilai_ikm' => $result['nilai_ikm'] ?? null,
+            'kategori' => $result['kategori'] ?? null,
             'label_kategori' => $result['label_kategori'] ?? null,
             // Timestamps
-            'created_at'     => $now,
-            'updated_at'     => $now,
+            'created_at' => $now,
+            'updated_at' => $now,
         ];
     }
 }

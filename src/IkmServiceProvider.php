@@ -2,7 +2,9 @@
 
 namespace Bale\Ikm;
 
-use Bale\Ikm\Console\InstallIkm;
+use Bale\Ikm\Commands\InstallIkm;
+use Bale\Ikm\Commands\MigrateIkm;
+use Bale\Ikm\Commands\SeedIkm;
 use Bale\Ikm\Models\IkmBatch;
 use Bale\Ikm\Policies\IkmPolicy;
 use Bale\Ikm\Services\IkmCalculatorService;
@@ -11,10 +13,17 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Str;
 use Livewire\Component as LivewireComponent;
+use Livewire\Livewire;
 use Symfony\Component\Finder\Finder;
 
 class IkmServiceProvider extends ServiceProvider
 {
+    /**
+     * Method register()
+     * 
+     * Digunakan untuk mendaftarkan service, binding, atau command
+     * ke dalam service container Laravel.
+     */
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/ikm.php', 'ikm');
@@ -39,18 +48,17 @@ class IkmServiceProvider extends ServiceProvider
 
     protected function registerCommands(): void
     {
-        $this->commands([
-            InstallIkm::class,
-        ]);
-    }
+        $commands = [
+            'command.ikm:install' => InstallIkm::class,
+            'command.ikm:migrate' => MigrateIkm::class,
+            'command.ikm:seed'    => SeedIkm::class,
+        ];
 
-    /**
-     * Daftarkan policy IkmBatch ke Laravel Gate.
-     * Dipanggil dari boot() agar Gate sudah siap.
-     */
-    protected function registerPolicies(): void
-    {
-        Gate::policy(IkmBatch::class, IkmPolicy::class);
+        foreach ($commands as $key => $class) {
+            $this->app->bind($key, $class);
+        }
+
+        $this->commands(array_keys($commands));
     }
 
     /**
@@ -77,6 +85,14 @@ class IkmServiceProvider extends ServiceProvider
     }
 
     /**
+     * Daftarkan policy IkmBatch ke Laravel Gate.
+     */
+    protected function registerPolicies(): void
+    {
+        Gate::policy(IkmBatch::class, IkmPolicy::class);
+    }
+
+    /**
      * Load migration langsung dari package.
      * 
      * Dengan ini, user bisa langsung menjalankan migration
@@ -98,7 +114,6 @@ class IkmServiceProvider extends ServiceProvider
     /**
      * Publish file agar bisa diubah oleh user.
      */
-
     protected function offerPublishing(): void
     {
         if (!$this->app->runningInConsole()) {
@@ -144,10 +159,11 @@ class IkmServiceProvider extends ServiceProvider
      */
     protected function getMigrationFileName(string $filename): string
     {
-        $timestamp = date('Y_m_d_His');
+        // Untuk IKM, migration diletakkan di folder tenant sesuai request
         $migrationName = str_replace('.php.stub', '.php', $filename);
+        $migrationName = str_replace('.stub', '', $migrationName);
 
-        return database_path('migrations/' . $timestamp . '_' . $migrationName);
+        return database_path('migrations/tenant/' . $migrationName);
     }
 
     /**
@@ -159,8 +175,8 @@ class IkmServiceProvider extends ServiceProvider
      * - Buat alias secara otomatis dari struktur folder
      * 
      * Contoh:
-     *   src/Livewire/Dashboard.php
-     *     => <livewire:ikm.dashboard />
+     *   src/Livewire/Overview.php
+     *     => <livewire:ikm.overview />
      *
      */
     protected function registerLivewireComponents(): void
@@ -203,7 +219,7 @@ class IkmServiceProvider extends ServiceProvider
             $alias = 'ikm.' . implode('.', $kebab);
 
             // Registrasi komponen ke Livewire
-            LivewireComponent::component($alias, $class);
+            Livewire::component($alias, $class);
         }
     }
 }

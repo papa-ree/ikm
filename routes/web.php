@@ -1,24 +1,39 @@
 <?php
 
-use Bale\Ikm\Livewire\Dashboard;
+use Bale\Cms\Middleware\EnsureBaleSelected;
+use Bale\Cms\Middleware\SwitchBaleConnection;
+use Bale\Ikm\Livewire\Overview;
 use Bale\Ikm\Livewire\IkmDetail;
 use Bale\Ikm\Livewire\IkmList;
 use Bale\Ikm\Livewire\Settings;
 use Bale\Ikm\Livewire\Upload;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['web', 'auth'])->prefix('ikm')->name('ikm.')->group(function () {
-    
-    // Dashboard - Perlu permission ikm.view
-    Route::get('/', Dashboard::class)->name('dashboard');
+/*
+|--------------------------------------------------------------------------
+| IKM Routes
+|--------------------------------------------------------------------------
+|
+| Diintegrasikan ke dalam prefix /cms agar sesuai dengan navigasi sidebar Bale CMS.
+| Menggunakan middleware tenant agar koneksi database sesuai dengan bale yang aktif.
+|
+*/
 
-    // List & Detail - Perlu permission ikm.view
-    Route::get('/batches', IkmList::class)->name('list');
-    Route::get('/batches/{batch}', IkmDetail::class)->name('detail');
+Route::middleware(['web', 'auth'])->prefix('cms/ikm')->name('ikm.')->group(function () {
 
-    // Upload - Perlu permission ikm.upload
-    Route::get('/upload', Upload::class)->name('upload');
+    Route::middleware([EnsureBaleSelected::class, SwitchBaleConnection::class])->group(function () {
 
-    // Settings - Perlu permission ikm.settings
-    Route::get('/settings', Settings::class)->name('settings');
+        // Overview IKM
+        Route::get('/', Overview::class)->name('overview');
+
+        // Riwayat & Detail Batch
+        Route::get('/batches', IkmList::class)->name('list');
+        Route::get('/batches/{id}', IkmDetail::class)->name('detail');
+
+        // Import Data IKM
+        Route::get('/upload', Upload::class)->name('upload');
+
+        // Pengaturan Variabel IKM
+        Route::get('/settings', Settings::class)->name('settings');
+    });
 });

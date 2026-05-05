@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Bale\Cms\Traits\UsesTenantConnection;
 
 class IkmRecord extends Model
 {
+    use UsesTenantConnection;
     use HasUuids;
     use SoftDeletes;
 
@@ -22,15 +24,34 @@ class IkmRecord extends Model
         'populasi',
         'sampel',
         // NRR per unsur
-        'nrr_u1', 'nrr_u2', 'nrr_u3', 'nrr_u4', 'nrr_u5',
-        'nrr_u6', 'nrr_u7', 'nrr_u8', 'nrr_u9',
+        'nrr_u1',
+        'nrr_u2',
+        'nrr_u3',
+        'nrr_u4',
+        'nrr_u5',
+        'nrr_u6',
+        'nrr_u7',
+        'nrr_u8',
+        'nrr_u9',
         // Demografi jenis kelamin
-        'dem_laki', 'dem_perempuan',
+        'dem_laki',
+        'dem_perempuan',
         // Demografi pendidikan
-        'dem_sd', 'dem_sltp', 'dem_slta', 'dem_diploma', 'dem_s1', 'dem_s2', 'dem_s3',
+        'dem_sd',
+        'dem_sltp',
+        'dem_slta',
+        'dem_diploma',
+        'dem_s1',
+        'dem_s2',
+        'dem_s3',
         // Demografi pekerjaan
-        'dem_pns', 'dem_tni_polri', 'dem_swasta', 'dem_wiraswasta',
-        'dem_pelajar', 'dem_petani', 'dem_lainnya',
+        'dem_pns',
+        'dem_tni_polri',
+        'dem_swasta',
+        'dem_wiraswasta',
+        'dem_pelajar',
+        'dem_petani',
+        'dem_lainnya',
         // Hasil kalkulasi
         'nrr_tertimbang',
         'nilai_ikm',
@@ -39,23 +60,23 @@ class IkmRecord extends Model
     ];
 
     protected $casts = [
-        'triwulan'       => 'integer',
-        'tahun'          => 'integer',
-        'populasi'       => 'integer',
-        'sampel'         => 'integer',
+        'triwulan' => 'integer',
+        'tahun' => 'integer',
+        'populasi' => 'integer',
+        'sampel' => 'integer',
         // NRR per unsur → float
-        'nrr_u1'         => 'float',
-        'nrr_u2'         => 'float',
-        'nrr_u3'         => 'float',
-        'nrr_u4'         => 'float',
-        'nrr_u5'         => 'float',
-        'nrr_u6'         => 'float',
-        'nrr_u7'         => 'float',
-        'nrr_u8'         => 'float',
-        'nrr_u9'         => 'float',
+        'nrr_u1' => 'float',
+        'nrr_u2' => 'float',
+        'nrr_u3' => 'float',
+        'nrr_u4' => 'float',
+        'nrr_u5' => 'float',
+        'nrr_u6' => 'float',
+        'nrr_u7' => 'float',
+        'nrr_u8' => 'float',
+        'nrr_u9' => 'float',
         // Hasil kalkulasi → float
         'nrr_tertimbang' => 'float',
-        'nilai_ikm'      => 'float',
+        'nilai_ikm' => 'float',
     ];
 
     // ─────────────────────────────────────────────
@@ -97,28 +118,28 @@ class IkmRecord extends Model
     protected function demografiRingkas(): Attribute
     {
         return Attribute::make(
-            get: fn () => [
+            get: fn() => [
                 'jenis_kelamin' => [
-                    'Laki-laki'  => $this->dem_laki,
-                    'Perempuan'  => $this->dem_perempuan,
+                    'Laki-laki' => $this->dem_laki,
+                    'Perempuan' => $this->dem_perempuan,
                 ],
                 'pendidikan' => [
-                    'SD'       => $this->dem_sd,
-                    'SLTP'     => $this->dem_sltp,
-                    'SLTA'     => $this->dem_slta,
-                    'Diploma'  => $this->dem_diploma,
-                    'S1'       => $this->dem_s1,
-                    'S2'       => $this->dem_s2,
-                    'S3'       => $this->dem_s3,
+                    'SD' => $this->dem_sd,
+                    'SLTP' => $this->dem_sltp,
+                    'SLTA' => $this->dem_slta,
+                    'Diploma' => $this->dem_diploma,
+                    'S1' => $this->dem_s1,
+                    'S2' => $this->dem_s2,
+                    'S3' => $this->dem_s3,
                 ],
                 'pekerjaan' => [
-                    'PNS/ASN'    => $this->dem_pns,
-                    'TNI/Polri'  => $this->dem_tni_polri,
-                    'Swasta'     => $this->dem_swasta,
+                    'PNS/ASN' => $this->dem_pns,
+                    'TNI/Polri' => $this->dem_tni_polri,
+                    'Swasta' => $this->dem_swasta,
                     'Wiraswasta' => $this->dem_wiraswasta,
-                    'Pelajar'    => $this->dem_pelajar,
-                    'Petani'     => $this->dem_petani,
-                    'Lainnya'    => $this->dem_lainnya,
+                    'Pelajar' => $this->dem_pelajar,
+                    'Petani' => $this->dem_petani,
+                    'Lainnya' => $this->dem_lainnya,
                 ],
             ]
         );

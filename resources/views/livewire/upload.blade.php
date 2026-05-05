@@ -1,94 +1,186 @@
-<div class="max-w-2xl mx-auto">
-    <div class="mb-8">
-        <h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Import Data IKM</h1>
-        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Silakan unggah file Excel IKM sesuai format PermenPAN-RB 14/2017.</p>
+<div class="max-w-3xl mx-auto space-y-6"
+    x-data="{
+        triwulan: $wire.entangle('triwulan'),
+        submitting: false,
+        async submit() {
+            if (this.submitting) return;
+            this.submitting = true;
+            try {
+                await $wire.save();
+            } finally {
+                this.submitting = false;
+            }
+        }
+    }">
+
+    {{-- Hero Header --}}
+    <div class="relative overflow-hidden p-8 text-white rounded-2xl shadow-xl"
+         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);">
+        <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32"></div>
+        <div class="absolute bottom-0 left-0 w-48 h-48 bg-white/10 rounded-full -ml-24 -mb-24"></div>
+        <div class="relative z-10 text-center">
+            <div class="inline-flex p-4 bg-white/20 backdrop-blur-md rounded-2xl mb-4">
+                <x-lucide-upload-cloud class="w-10 h-10 text-white" />
+            </div>
+            <h1 class="text-3xl font-bold text-white md:text-4xl">Import Data IKM</h1>
+            <p class="mt-2 text-white/90 max-w-lg mx-auto text-lg">
+                Unggah berkas Excel hasil pengolahan kuesioner IKM sesuai standar PermenPAN-RB 14/2017.
+            </p>
+        </div>
     </div>
 
-    <form wire:submit="save" class="space-y-6">
-        <div class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 shadow-sm space-y-6">
-            <!-- Nama Batch -->
+    {{-- Info Banner --}}
+    <div class="p-5 bg-linear-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl"
+         data-aos="fade-up" data-aos-delay="100">
+        <div class="flex items-start gap-4">
+            <div class="p-2.5 bg-amber-600 rounded-xl shadow-lg shrink-0">
+                <x-lucide-info class="w-5 h-5 text-white" />
+            </div>
             <div>
-                <label for="nama" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Nama Batch / Label</label>
-                <input type="text" id="nama" wire:model="nama" placeholder="Contoh: IKM TW1 2025" class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm focus:ring-primary-500 focus:border-primary-500 transition-all">
-                @error('nama') <span class="text-xs text-rose-500 mt-1">{{ $message }}</span> @enderror
+                <h3 class="text-sm font-bold text-gray-900 dark:text-white mb-1">Panduan Unggah Berkas</h3>
+                <p class="text-xs text-gray-600 dark:text-gray-400">
+                    Pastikan format file sesuai template IKM standar PermenPAN-RB 14/2017.
+                    Hanya file <strong>.xlsx</strong> atau <strong>.xls</strong> yang diterima (Maks. 5MB).
+                </p>
+            </div>
+        </div>
+    </div>
+
+    {{-- Form Card --}}
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-100 dark:border-gray-700 overflow-hidden relative"
+         data-aos="fade-up" data-aos-delay="150">
+
+        {{-- Decorative glow --}}
+        <div class="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none"></div>
+
+        {{-- Card Header --}}
+        <div class="px-8 py-5 border-b border-gray-100 dark:border-gray-700
+                    bg-linear-to-r from-indigo-50/50 to-purple-50/50 dark:from-indigo-900/10 dark:to-purple-900/10">
+            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Detail Batch Import</h3>
+            <p class="text-sm text-gray-500 dark:text-gray-400 mt-0.5">Isi informasi batch dan unggah file Excel IKM.</p>
+        </div>
+
+        <div class="p-8 relative z-10 space-y-6">
+
+            {{-- Nama Batch --}}
+            <div>
+                <label for="nama" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                    Label Identitas Batch
+                </label>
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-300 group-focus-within:text-indigo-500 transition-colors z-10">
+                        <x-lucide-tag class="w-4 h-4" />
+                    </div>
+                    <x-core::input
+                        id="nama"
+                        wire:model="nama"
+                        type="text"
+                        placeholder="Contoh: Laporan IKM Triwulan 1 Tahun 2025"
+                        class="pl-11"
+                    />
+                </div>
+                @error('nama')
+                    <p class="text-xs font-medium text-red-500 mt-1.5">{{ $message }}</p>
+                @enderror
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <!-- Triwulan -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {{-- Triwulan — Alpine-only, sync ke Livewire via x-model --}}
                 <div>
-                    <label for="triwulan" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Triwulan</label>
-                    <select id="triwulan" wire:model="triwulan" class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm focus:ring-primary-500 focus:border-primary-500 transition-all">
-                        <option value="1">Triwulan 1</option>
-                        <option value="2">Triwulan 2</option>
-                        <option value="3">Triwulan 3</option>
-                        <option value="4">Triwulan 4</option>
-                    </select>
-                    @error('triwulan') <span class="text-xs text-rose-500 mt-1">{{ $message }}</span> @enderror
+                    <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                        Periode Triwulan
+                    </label>
+                    <div class="grid grid-cols-4 gap-2">
+                        @foreach([1, 2, 3, 4] as $tw)
+                        <button
+                            type="button"
+                            @click="triwulan = {{ $tw }}"
+                            :class="triwulan === {{ $tw }}
+                                ? 'bg-linear-to-r from-indigo-600 to-purple-600 text-white border-transparent shadow-md shadow-purple-500/20'
+                                : 'bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 border-gray-200 dark:border-gray-700 hover:border-indigo-400 dark:hover:border-indigo-600'"
+                            class="py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 border">
+                            TW{{ $tw }}
+                        </button>
+                        @endforeach
+                    </div>
+                    {{-- Badge konfirmasi pilihan aktif --}}
+                    <p class="mt-2 text-[11px] text-gray-400 dark:text-gray-500">
+                        Dipilih: <span class="font-semibold text-indigo-600 dark:text-indigo-400" x-text="'Triwulan ' + triwulan"></span>
+                    </p>
+                    @error('triwulan')
+                        <p class="text-xs font-medium text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
-                <!-- Tahun -->
+                {{-- Tahun --}}
                 <div>
-                    <label for="tahun" class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">Tahun</label>
-                    <input type="number" id="tahun" wire:model="tahun" class="w-full rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-sm focus:ring-primary-500 focus:border-primary-500 transition-all">
-                    @error('tahun') <span class="text-xs text-rose-500 mt-1">{{ $message }}</span> @enderror
+                    <label for="tahun" class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+                        Tahun Pelaporan
+                    </label>
+                    <div class="relative group">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-300 group-focus-within:text-indigo-500 transition-colors z-10">
+                            <x-lucide-calendar class="w-4 h-4" />
+                        </div>
+                        <x-core::input
+                            id="tahun"
+                            wire:model="tahun"
+                            type="number"
+                            min="2020"
+                            max="2099"
+                            class="pl-11"
+                        />
+                    </div>
+                    @error('tahun')
+                        <p class="text-xs font-medium text-red-500 mt-1.5">{{ $message }}</p>
+                    @enderror
                 </div>
             </div>
 
-            <!-- File Upload -->
+            {{-- File Upload Zone --}}
             <div>
-                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2">File Excel</label>
-                <div 
-                    x-data="{ isDragging: false }"
-                    @dragover.prevent="isDragging = true"
-                    @dragleave.prevent="isDragging = false"
-                    @drop.prevent="isDragging = false"
-                    class="relative border-2 border-dashed rounded-3xl p-10 flex flex-col items-center justify-center transition-all cursor-pointer"
-                    :class="isDragging ? 'border-primary-500 bg-primary-50/10' : 'border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-950/50'"
-                >
-                    <input type="file" wire:model="file" class="absolute inset-0 opacity-0 cursor-pointer" id="file_upload">
-                    
-                    <div class="p-4 rounded-2xl bg-white dark:bg-slate-900 shadow-sm mb-4">
-                        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
-                    </div>
-                    
-                    @if($file)
-                        <div class="text-center">
-                            <p class="text-sm font-bold text-slate-900 dark:text-white">{{ $file->getClientOriginalName() }}</p>
-                            <p class="text-xs text-slate-500 mt-1">{{ number_format($file->getSize() / 1024, 2) }} KB</p>
-                        </div>
-                    @else
-                        <div class="text-center">
-                            <p class="text-sm font-bold text-slate-900 dark:text-white">Klik untuk upload atau drag & drop</p>
-                            <p class="text-xs text-slate-500 mt-1">Hanya file .xlsx atau .xls (Max. 5MB)</p>
-                        </div>
-                    @endif
-
-                    <!-- Upload Progress -->
-                    <div x-show="isUploading" class="w-full mt-6">
-                        <div class="h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                            <div class="h-full bg-primary-600 transition-all duration-300" :style="'width: ' + progress + '%'"></div>
-                        </div>
-                    </div>
-                </div>
-                @error('file') <span class="text-xs text-rose-500 mt-1">{{ $message }}</span> @enderror
+                <label class="block text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                    Berkas Dokumentasi (Excel)
+                </label>
+                <x-core::upload-zone
+                    wire:model.live="file"
+                    accept=".xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel"
+                    :maxSize="5120"
+                    :label="__('Tarik & Lepas File ke Sini')"
+                    :hint="__('Hanya file .xlsx atau .xls (Maks. 5MB)')"
+                    class="w-full"
+                />
+                @error('file')
+                    <p class="text-xs font-medium text-red-500 mt-2 text-center">{{ $message }}</p>
+                @enderror
             </div>
         </div>
 
-        <div class="flex items-center justify-end gap-4">
-            <a href="{{ route('ikm.list') }}" wire:navigate class="px-6 py-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-bold hover:bg-slate-50 dark:hover:bg-slate-800 transition-all">
-                Batal
+        {{-- Card Footer / Actions --}}
+        <div class="px-8 py-5 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700
+                    flex flex-col sm:flex-row items-center justify-between gap-4">
+            <a href="{{ route('ikm.list') }}" wire:navigate
+               class="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700
+                      text-gray-600 dark:text-gray-400 font-semibold text-sm
+                      hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-center shadow-sm">
+                Kembali
             </a>
-            <button 
-                type="submit" 
-                wire:loading.attr="disabled"
-                class="px-8 py-3 rounded-2xl bg-primary-600 text-white font-bold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-primary-500/20 flex items-center gap-2"
-            >
-                <svg wire:loading class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <button
+                type="button"
+                @click="submit()"
+                :disabled="submitting"
+                :class="submitting ? 'opacity-60 cursor-not-allowed' : 'hover:from-purple-700 hover:to-purple-800 hover:shadow-lg'"
+                class="w-full sm:w-auto px-10 py-2.5 rounded-lg bg-linear-to-r from-purple-600 to-purple-700
+                       text-white font-semibold text-sm transition-all shadow-md
+                       flex items-center justify-center gap-3">
+                <svg x-show="submitting"
+                     class="w-4 h-4 animate-spin text-white/70"
+                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
                 </svg>
-                <span>Proses Import</span>
+                <x-lucide-database-backup x-show="!submitting" class="w-4 h-4" />
+                <span x-text="submitting ? 'Memproses...' : 'Mulai Import Data'"></span>
             </button>
         </div>
-    </form>
+    </div>
 </div>

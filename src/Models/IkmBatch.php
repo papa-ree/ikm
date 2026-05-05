@@ -6,9 +6,11 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Bale\Cms\Traits\UsesTenantConnection;
 
 class IkmBatch extends Model
 {
+    use UsesTenantConnection;
     use HasUuids;
     use SoftDeletes;
 
@@ -29,9 +31,9 @@ class IkmBatch extends Model
     ];
 
     protected $casts = [
-        'triwulan'    => 'integer',
-        'tahun'       => 'integer',
-        'jumlah_opd'  => 'integer',
+        'triwulan' => 'integer',
+        'tahun' => 'integer',
+        'jumlah_opd' => 'integer',
         'approved_at' => 'datetime',
     ];
 
@@ -45,7 +47,7 @@ class IkmBatch extends Model
     protected function labelTriwulan(): Attribute
     {
         return Attribute::make(
-            get: fn () => "Triwulan {$this->triwulan} {$this->tahun}",
+            get: fn() => "Triwulan {$this->triwulan} {$this->tahun}",
         );
     }
 
@@ -59,11 +61,11 @@ class IkmBatch extends Model
         return Attribute::make(
             get: function () {
                 return match ($this->status) {
-                    'draft'    => ['label' => 'Draft',    'color' => 'gray'],
+                    'draft' => ['label' => 'Draft', 'color' => 'gray'],
                     'diproses' => ['label' => 'Diproses', 'color' => 'yellow'],
-                    'selesai'  => ['label' => 'Selesai',  'color' => 'green'],
-                    'gagal'    => ['label' => 'Gagal',    'color' => 'red'],
-                    default    => ['label' => ucfirst($this->status), 'color' => 'gray'],
+                    'selesai' => ['label' => 'Selesai', 'color' => 'green'],
+                    'gagal' => ['label' => 'Gagal', 'color' => 'red'],
+                    default => ['label' => ucfirst($this->status), 'color' => 'gray'],
                 };
             }
         );

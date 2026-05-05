@@ -2,12 +2,14 @@
 
 namespace Bale\Ikm\Models;
 
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection;
+use Bale\Cms\Traits\UsesTenantConnection;
 
 class IkmSetting extends Model
 {
+    use UsesTenantConnection;
     use HasUuids;
 
     protected $table = 'ikm_settings';

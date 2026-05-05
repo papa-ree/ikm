@@ -11,8 +11,8 @@ use Livewire\Component;
 use Bale\Cms\Services\TenantConnectionService;
 
 #[Layout('cms::layouts.app')]
-#[Title('Dashboard IKM')]
-class Dashboard extends Component
+#[Title('Overview IKM')]
+class Overview extends Component
 {
     public int $tahun;
     public int $triwulan;
@@ -61,7 +61,7 @@ class Dashboard extends Component
         // ── Opsi Filter ─────────────────────────────
         $tahunOptions = range(2020, (int) now()->format('Y'));
 
-        return view('ikm::livewire.dashboard', compact(
+        return view('ikm::livewire.overview', compact(
             'records', 'rataRata', 'jumlahA', 'jumlahB', 'dibawahB',
             'top5', 'bottom5', 'tahunOptions',
         ));

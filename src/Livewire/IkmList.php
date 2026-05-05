@@ -9,8 +9,9 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Bale\Cms\Services\TenantConnectionService;
 
-#[Layout('ikm::layouts.app')]
+#[Layout('cms::layouts.app')]
 #[Title('Daftar Batch IKM')]
 class IkmList extends Component
 {
@@ -24,6 +25,7 @@ class IkmList extends Component
 
     public function mount(): void
     {
+        TenantConnectionService::ensureActive();
         $this->perPage = config('ikm.per_page', 20);
     }
 
@@ -35,6 +37,7 @@ class IkmList extends Component
 
     public function deleteBatch(string $id): void
     {
+        TenantConnectionService::ensureActive();
         $batch = IkmBatch::findOrFail($id);
         $this->authorize('delete', $batch);
         $batch->delete();
@@ -43,6 +46,7 @@ class IkmList extends Component
 
     public function approveBatch(string $id): void
     {
+        TenantConnectionService::ensureActive();
         $batch = IkmBatch::findOrFail($id);
         $this->authorize('approve', $batch);
 
@@ -57,6 +61,8 @@ class IkmList extends Component
 
     public function render()
     {
+        TenantConnectionService::ensureActive();
+        
         $batches = IkmBatch::query()
             ->with(['uploadedBy:id,name', 'approvedBy:id,name'])
             ->when($this->search, fn ($q) =>
@@ -73,7 +79,7 @@ class IkmList extends Component
         $canDelete  = Auth::user()?->can(IkmPermissions::DELETE_IKM);
         $canApprove = Auth::user()?->can(IkmPermissions::APPROVE_IKM);
 
-        return view('ikm::livewire.ikm-list', compact(
+        return view('ikm::livewire.list', compact(
             'batches', 'tahunOptions', 'canDelete', 'canApprove',
         ));
     }
