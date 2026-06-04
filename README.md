@@ -1,84 +1,87 @@
-# IKM Package for bale
+# IKM Package for Balé
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/bale/ikm.svg?style=flat-square)](https://packagist.org/packages/bale/ikm)
-[![GitHub Tests Action Status](https://img.shields.io/github/actions/workflow/status/bale/ikm/run-tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/bale/ikm/actions?query=workflow%3Arun-tests+branch%3Amain)
-[![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/bale/ikm/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/bale/ikm/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/bale/ikm.svg?style=flat-square)](https://packagist.org/packages/bale/ikm)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
+Paket **IKM (Indeks Kepuasan Masyarakat)** untuk ekosistem Balé. Paket ini menyediakan fungsionalitas lengkap untuk mengelola, menghitung, dan menampilkan data survei kepuasan masyarakat secara sistematis.
 
-## Support us
+## Fitur Utama
 
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/ikm.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/ikm)
+- 📊 **Dashboard IKM**: Visualisasi data indeks secara real-time.
+- 📥 **Sistem Import**: Upload data dari Excel dengan validasi otomatis.
+- ⚙️ **Pengaturan Fleksibel**: Konfigurasi parameter penilaian IKM sesuai standar.
+- 👥 **Manajemen Akses**: Role & Permissions terintegrasi (Admin Pusat & Admin OPD).
+- 🧩 **Komponen Livewire**: UI interaktif siap pakai untuk Dashboard, List, Detail, dan Settings.
 
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
+## Instalasi
 
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+1. Install paket melalui composer:
+   ```bash
+   composer require bale/ikm
+   ```
 
-## Installation
+2. Jalankan perintah instalasi interaktif:
+   ```bash
+   php artisan ikm:install
+   ```
+   *Perintah ini akan memandu Anda untuk menjalankan migrasi, membuat role & permission, serta melakukan seeding pengaturan awal.*
 
-You can install the package via composer:
+## Perintah Artisan (Commands)
 
-```bash
-composer require bale/ikm
+Paket ini menyediakan beberapa perintah khusus untuk memudahkan pengelolaan:
+
+| Command | Deskripsi |
+| :--- | :--- |
+| `ikm:install` | Installer interaktif (Setup migrasi, role, permission, dan seed data). |
+| `ikm:publish` | Menyalin file migrasi dari paket ke folder `database/migrations/ikm` aplikasi Anda. |
+| `ikm:migrate` | Menjalankan proses migrasi database khusus untuk tabel-tabel IKM. |
+| `ikm:seed` | Mengisi data default untuk pengaturan awal IKM. |
+
+## Penggunaan
+
+### Komponen UI (Livewire)
+
+Anda dapat menggunakan komponen Livewire yang sudah tersedia langsung di dalam view Blade Anda:
+
+```blade
+{{-- Dashboard Utama IKM --}}
+<livewire:ikm.dashboard />
+
+{{-- Daftar Rekapitulasi IKM --}}
+<livewire:ikm.ikm-list />
+
+{{-- Pengaturan Parameter IKM --}}
+<livewire:ikm.settings />
 ```
 
-You can publish and run the migrations with:
+### Navigasi / Namespace
 
-```bash
-php artisan vendor:publish --tag="ikm-migrations"
-php artisan migrate
-```
+Komponen didaftarkan secara otomatis dengan prefix `ikm.`. Contoh alias yang tersedia:
+- `ikm.dashboard`
+- `ikm.overview`
+- `ikm.upload`
+- `ikm.settings`
+- `ikm.ikm-list`
+- `ikm.ikm-detail`
 
-You can publish the config file with:
+## Konfigurasi
 
+Untuk mengubah konfigurasi default, publish file config:
 ```bash
 php artisan vendor:publish --tag="ikm-config"
 ```
 
-This is the contents of the published config file:
+## Keamanan & Akses
 
-```php
-return [
-];
-```
+Paket ini menggunakan sistem permission yang ketat:
+- **`ikm-admin-pusat`**: Akses penuh ke seluruh fitur dan data.
+- **`ikm-admin-opd`**: Akses terbatas sesuai dengan lingkup organisasi/OPD terkait.
 
-Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="ikm-views"
-```
-
-## Usage
-
-```php
-$ikm = new Bale\Ikm();
-echo $ikm->echoPhrase('Hello, Bale!');
-```
-
-## Testing
-
-```bash
-composer test
-```
-
-## Changelog
-
-Please see [CHANGELOG](CHANGELOG.md) for more information on what has changed recently.
-
-## Contributing
-
-Please see [CONTRIBUTING](CONTRIBUTING.md) for details.
-
-## Security Vulnerabilities
-
-Please review [our security policy](../../security/policy) on how to report security vulnerabilities.
-
-## Credits
+## Kredit
 
 - [Papa Ree](https://github.com/paparee)
 - [All Contributors](../../contributors)
 
-## License
+## Lisensi
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
+The MIT License (MIT). Silakan lihat [File Lisensi](LICENSE.md) untuk informasi lebih lanjut.

@@ -11,7 +11,7 @@ class MigrateIkm extends Command
 {
     protected $signature = 'ikm:migrate {--tenant= : The slug of the tenant}';
 
-    protected $description = 'Publish IKM migrations and run them for a specific tenant database';
+    protected $description = 'Run IKM migrations for a specific tenant database';
 
     public function handle(): int
     {
@@ -32,13 +32,6 @@ class MigrateIkm extends Command
 
         try {
             $tenant = BaleList::where('slug', $tenantSlug)->firstOrFail();
-            
-            // 1. Publish migrations first
-            $this->info("Publishing IKM migrations...");
-            $this->call('vendor:publish', [
-                '--tag'   => 'ikm:migrations',
-                '--force' => true,
-            ]);
 
             // 2. Initialize tenant connection
             // We use TenantManager directly to bypass session/auth checks in TenantConnectionService
@@ -55,8 +48,8 @@ class MigrateIkm extends Command
             // 3. Run migrations for the specific connection and path
             $this->call('migrate', [
                 '--database' => $connection,
-                '--path'     => 'database/migrations/tenant',
-                '--force'    => true,
+                '--path' => 'database/migrations/ikm',
+                '--force' => true,
             ]);
 
             $this->info("Migration for tenant {$tenant->slug} completed.");

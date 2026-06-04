@@ -20,33 +20,48 @@ class InstallIkm extends Command
         $this->renderHeader();
 
         $option = $this->choice(
-            'What would you like to install/run?',
+            'What would you like to do?',
             [
-                0 => 'All (Migrations, Permissions, Settings)',
-                1 => 'Role & Permissions Only',
-                2 => 'Migrations Only',
+                0 => 'Publish Assets',
+                1 => 'Role & Permission Only',
+                2 => 'Migration Only',
+                3 => 'Seed Only',
+                4 => 'Exit',
             ],
             0
         );
 
         try {
-            if ($option === 'All (Migrations, Permissions, Settings)' || $option === 'Role & Permissions Only' || $option === 0 || $option === 1) {
-                $this->task('Seeding permissions and roles', function () {
-                    $this->seedPermissions();
-                    $this->seedRoles();
-                });
-            }
+            switch ($option) {
+                case 'Publish Assets':
+                case 0:
+                    $this->task('Publishing migrations and config', function () {
+                        $this->call('ikm:publish');
+                    });
+                    break;
 
-            if ($option === 'All (Migrations, Permissions, Settings)' || $option === 'Migrations Only' || $option === 0 || $option === 2) {
-                $this->task('Running migrations', function () {
+                case 'Role & Permission Only':
+                case 1:
+                    $this->task('Seeding permissions and roles to Main DB', function () {
+                        $this->seedPermissions();
+                        $this->seedRoles();
+                    });
+                    break;
+
+                case 'Migration Only':
+                case 2:
                     $this->call('ikm:migrate');
-                });
-            }
+                    break;
 
-            if ($option === 'All (Migrations, Permissions, Settings)' || $option === 0) {
-                $this->task('Seeding IKM settings', function () {
+                case 'Seed Only':
+                case 3:
                     $this->call('ikm:seed');
-                });
+                    break;
+
+                case 'Exit':
+                case 4:
+                    $this->info('Exit installation.');
+                    return self::SUCCESS;
             }
 
             $this->newLine();
@@ -77,7 +92,7 @@ class InstallIkm extends Command
 
         // Force sync to root role if exists
         $rootRole = Role::where('name', 'root')->first();
-        if ($rootRole) {
+        if ($rootRole instanceof Role) {
             $this->info('Force syncing IKM permissions to root role...');
             $rootRole->givePermissionTo(IkmPermissions::ALL);
 

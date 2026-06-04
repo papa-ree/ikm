@@ -4,6 +4,7 @@ namespace Bale\Ikm;
 
 use Bale\Ikm\Commands\InstallIkm;
 use Bale\Ikm\Commands\MigrateIkm;
+use Bale\Ikm\Commands\PublishIkmCommand;
 use Bale\Ikm\Commands\SeedIkm;
 use Bale\Ikm\Models\IkmBatch;
 use Bale\Ikm\Policies\IkmPolicy;
@@ -50,6 +51,7 @@ class IkmServiceProvider extends ServiceProvider
     {
         $commands = [
             'command.ikm:install' => InstallIkm::class,
+            'command.ikm:publish' => PublishIkmCommand::class,
             'command.ikm:migrate' => MigrateIkm::class,
             'command.ikm:seed'    => SeedIkm::class,
         ];
