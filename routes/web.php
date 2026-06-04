@@ -24,7 +24,7 @@ Route::middleware(['web', 'auth'])->prefix('cms/ikm')->name('ikm.')->group(funct
     Route::middleware([EnsureBaleSelected::class, SwitchBaleConnection::class])->group(function () {
 
         // Overview IKM
-        Route::get('/', Overview::class)->name('overview');
+        Route::get('/overview', Overview::class)->name('overview');
 
         // Riwayat & Detail Batch
         Route::get('/batches', IkmList::class)->name('list');

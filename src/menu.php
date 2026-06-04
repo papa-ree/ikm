@@ -5,10 +5,10 @@ return [
         'id' => 'ikm-overview',
         'group' => 'ikm',
         'label' => 'Overview',
-        'url' => 'ikm',
+        'url' => 'ikm/overview',
         'icon' => 'bar-chart-3',
-        'permission' => \Bale\Ikm\IkmPermissions::VIEW_IKM,
-        'table'      => 'ikm_records',
+        'permission' => 'ikm.view',
+        'table'      => 'ikm_batches',
     ],
     [
         'id' => 'ikm-list',
@@ -16,7 +16,7 @@ return [
         'label' => 'Riwayat Batch',
         'url' => 'ikm/batches',
         'icon' => 'list-ordered',
-        'permission' => \Bale\Ikm\IkmPermissions::VIEW_IKM,
+        'permission' => 'ikm.view',
         'table'      => 'ikm_batches',
     ],
     [
@@ -25,7 +25,7 @@ return [
         'label' => 'Import Data',
         'url' => 'ikm/upload',
         'icon' => 'upload-cloud',
-        'permission' => \Bale\Ikm\IkmPermissions::UPLOAD_IKM,
+        'permission' => 'ikm.upload',
         'table'      => 'ikm_batches',
     ],
     [
@@ -34,7 +34,7 @@ return [
         'label' => 'Pengaturan',
         'url' => 'ikm/settings',
         'icon' => 'settings-2',
-        'permission' => \Bale\Ikm\IkmPermissions::MANAGE_SETTINGS,
+        'permission' => 'ikm.settings',
         'table'      => 'ikm_settings',
     ],
 ];
