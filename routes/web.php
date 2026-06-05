@@ -24,16 +24,16 @@ Route::middleware(['web', 'auth'])->prefix('cms/ikm')->name('ikm.')->group(funct
     Route::middleware([EnsureBaleSelected::class, SwitchBaleConnection::class])->group(function () {
 
         // Overview IKM
-        Route::get('/overview', Overview::class)->name('overview');
+        Route::get('/overview', Overview::class)->middleware('permission:ikm.view')->name('overview');
 
         // Riwayat & Detail Batch
-        Route::get('/batches', IkmList::class)->name('list');
-        Route::get('/batches/{id}', IkmDetail::class)->name('detail');
+        Route::get('/batches', IkmList::class)->middleware('permission:ikm.view')->name('list');
+        Route::get('/batches/{id}', IkmDetail::class)->middleware('permission:ikm.view')->name('detail');
 
         // Import Data IKM
-        Route::get('/upload', Upload::class)->name('upload');
+        Route::get('/upload', Upload::class)->middleware('permission:ikm.upload')->name('upload');
 
         // Pengaturan Variabel IKM
-        Route::get('/settings', Settings::class)->name('settings');
+        Route::get('/settings', Settings::class)->middleware('permission:ikm.settings')->name('settings');
     });
 });
