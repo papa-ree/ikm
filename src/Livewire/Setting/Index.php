@@ -1,6 +1,6 @@
 <?php
 
-namespace Bale\Ikm\Livewire;
+namespace Bale\Ikm\Livewire\Setting;
 
 use Bale\Ikm\IkmPermissions;
 use Bale\Ikm\Models\IkmSetting;
@@ -12,7 +12,7 @@ use Bale\Cms\Services\TenantConnectionService;
 
 #[Layout('cms::layouts.app')]
 #[Title('Pengaturan Kategori IKM')]
-class Settings extends Component
+class Index extends Component
 {
     /** @var array<string, array{label: string, min: float|string, max: float|string}> */
     public array $kategori = [];
@@ -34,8 +34,8 @@ class Settings extends Component
 
         foreach ($this->kategori as $kode => $values) {
             $kodeLC = strtolower($kode);
-            IkmSetting::set("kategori_{$kodeLC}_min",   $values['min']);
-            IkmSetting::set("kategori_{$kodeLC}_max",   $values['max']);
+            IkmSetting::set("kategori_{$kodeLC}_min", $values['min']);
+            IkmSetting::set("kategori_{$kodeLC}_max", $values['max']);
             IkmSetting::set("kategori_{$kodeLC}_label", $values['label']);
         }
 
@@ -52,8 +52,8 @@ class Settings extends Component
         foreach ($defaults as $kode => $values) {
             $this->kategori[$kode] = [
                 'label' => $values['label'],
-                'min'   => $values['min'],
-                'max'   => $values['max'],
+                'min' => $values['min'],
+                'max' => $values['max'],
             ];
         }
 
@@ -63,7 +63,7 @@ class Settings extends Component
 
     public function render()
     {
-        return view('ikm::livewire.settings', [
+        return view('ikm::livewire.setting.index', [
             'kodeList' => array_keys($this->kategori),
         ]);
     }
@@ -80,8 +80,8 @@ class Settings extends Component
             $kodeLC = strtolower($kode);
             $this->kategori[$kode] = [
                 'label' => IkmSetting::get("kategori_{$kodeLC}_label", $defaults['label']),
-                'min'   => IkmSetting::get("kategori_{$kodeLC}_min",   $defaults['min']),
-                'max'   => IkmSetting::get("kategori_{$kodeLC}_max",   $defaults['max']),
+                'min' => IkmSetting::get("kategori_{$kodeLC}_min", $defaults['min']),
+                'max' => IkmSetting::get("kategori_{$kodeLC}_max", $defaults['max']),
             ];
         }
     }
@@ -91,8 +91,8 @@ class Settings extends Component
         $rules = [];
         foreach (array_keys($this->kategori) as $kode) {
             $rules["kategori.{$kode}.label"] = 'required|string|max:50';
-            $rules["kategori.{$kode}.min"]   = 'required|numeric|min:0|max:100';
-            $rules["kategori.{$kode}.max"]   = 'required|numeric|min:0|max:100';
+            $rules["kategori.{$kode}.min"] = 'required|numeric|min:0|max:100';
+            $rules["kategori.{$kode}.max"] = 'required|numeric|min:0|max:100';
         }
         return $rules;
     }

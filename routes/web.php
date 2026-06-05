@@ -3,9 +3,9 @@
 use Bale\Cms\Middleware\EnsureBaleSelected;
 use Bale\Cms\Middleware\SwitchBaleConnection;
 use Bale\Ikm\Livewire\Overview;
-use Bale\Ikm\Livewire\IkmDetail;
-use Bale\Ikm\Livewire\IkmList;
-use Bale\Ikm\Livewire\Settings;
+use Bale\Ikm\Livewire\Batch;
+use Bale\Ikm\Livewire\Detail;
+use Bale\Ikm\Livewire\Setting;
 use Bale\Ikm\Livewire\Upload;
 use Illuminate\Support\Facades\Route;
 
@@ -27,13 +27,13 @@ Route::middleware(['web', 'auth'])->prefix('cms/ikm')->name('ikm.')->group(funct
         Route::get('/overview', Overview::class)->middleware('permission:ikm.view')->name('overview');
 
         // Riwayat & Detail Batch
-        Route::get('/batches', IkmList::class)->middleware('permission:ikm.view')->name('list');
-        Route::get('/batches/{id}', IkmDetail::class)->middleware('permission:ikm.view')->name('detail');
+        Route::get('/batches', Batch\Index::class)->middleware('permission:ikm.view')->name('list');
+        Route::get('/batches/{id}', Detail\Index::class)->middleware('permission:ikm.view')->name('detail');
 
         // Import Data IKM
         Route::get('/upload', Upload::class)->middleware('permission:ikm.upload')->name('upload');
 
         // Pengaturan Variabel IKM
-        Route::get('/settings', Settings::class)->middleware('permission:ikm.settings')->name('settings');
+        Route::get('/settings', Setting\Index::class)->middleware('permission:ikm.settings')->name('settings');
     });
 });

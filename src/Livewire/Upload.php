@@ -86,6 +86,21 @@ class Upload extends Component
         }
     }
 
+    public function downloadTemplate()
+    {
+        TenantConnectionService::ensureActive();
+        $disk = app()->isProduction() ? 's3' : 'local';
+        $slug = session('bale_active_slug');
+        $path = $slug . '/ikm/template_ikm_standar.xlsx';
+
+        if (!Storage::disk($disk)->exists($path)) {
+            $this->dispatch('toast', message: 'Template belum diunggah oleh admin.', type: 'warning');
+            return null;
+        }
+
+        return Storage::disk($disk)->download($path, 'Template_IKM_Standar.xlsx');
+    }
+
     public function render()
     {
         return view('ikm::livewire.upload');

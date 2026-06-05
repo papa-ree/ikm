@@ -60,10 +60,14 @@ class IkmBatch extends Model
     {
         return Attribute::make(
             get: function () {
+                if ($this->status === 'selesai' && $this->approved_at) {
+                    return ['label' => 'Disetujui', 'color' => 'emerald'];
+                }
+
                 return match ($this->status) {
                     'draft' => ['label' => 'Draft', 'color' => 'gray'],
-                    'diproses' => ['label' => 'Diproses', 'color' => 'yellow'],
-                    'selesai' => ['label' => 'Selesai', 'color' => 'green'],
+                    'diproses' => ['label' => 'Diproses', 'color' => 'amber'],
+                    'selesai' => ['label' => 'Selesai', 'color' => 'blue'],
                     'gagal' => ['label' => 'Gagal', 'color' => 'red'],
                     default => ['label' => ucfirst($this->status), 'color' => 'gray'],
                 };

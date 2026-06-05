@@ -158,29 +158,50 @@
         {{-- Card Footer / Actions --}}
         <div class="px-8 py-5 bg-gray-50 dark:bg-gray-900/50 border-t border-gray-100 dark:border-gray-700
                     flex flex-col sm:flex-row items-center justify-between gap-4">
-            <a href="{{ route('ikm.list') }}" wire:navigate
-               class="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700
-                      text-gray-600 dark:text-gray-400 font-semibold text-sm
-                      hover:bg-gray-50 dark:hover:bg-gray-700 transition-all text-center shadow-sm">
-                Kembali
-            </a>
-            <button
+            <div class="flex flex-wrap items-center justify-center gap-3 shrink-0">
+                <x-core::button 
+                    link 
+                    href="{{ route('ikm.list') }}" 
+                    variant="secondary" 
+                    label="Kembali"
+                    class="px-5"
+                >
+                    <x-slot name="icon">
+                        <x-lucide-arrow-left class="w-4 h-4" />
+                    </x-slot>
+                </x-core::button>
+
+                <x-core::button 
+                    variant="success" 
+                    label="Unduh Template Excel" 
+                    wire:click="downloadTemplate"
+                    wire:loading.attr="disabled"
+                    wire:target="downloadTemplate"  
+                >
+                    <x-slot name="icon">
+                        <div wire:loading wire:target="downloadTemplate" class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        <x-lucide-check-circle wire:loading.remove wire:target="downloadTemplate" class="w-4 h-4" />
+                    </x-slot>
+                </x-core::button>
+            </div>
+            <x-core::button
                 type="button"
-                @click="submit()"
-                :disabled="submitting"
-                :class="submitting ? 'opacity-60 cursor-not-allowed' : 'hover:from-purple-700 hover:to-purple-800 hover:shadow-lg'"
-                class="w-full sm:w-auto px-10 py-2.5 rounded-lg bg-linear-to-r from-purple-600 to-purple-700
-                       text-white font-semibold text-sm transition-all shadow-md
-                       flex items-center justify-center gap-3">
-                <svg x-show="submitting"
-                     class="w-4 h-4 animate-spin text-white/70"
-                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
-                </svg>
-                <x-lucide-database-backup x-show="!submitting" class="w-4 h-4" />
-                <span x-text="submitting ? 'Memproses...' : 'Mulai Import Data'"></span>
-            </button>
+                x-on:click="submit()"
+                x-bind:disabled="submitting"
+                label=""
+                class="w-full sm:w-auto px-10"
+            >
+                <x-slot name="icon">
+                    <svg x-show="submitting"
+                         class="w-4 h-4 animate-spin text-white/70"
+                         xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                    </svg>
+                    <x-lucide-database-backup x-show="!submitting" class="w-4 h-4" />
+                    <span x-text="submitting ? 'Memproses...' : 'Mulai Import Data'"></span>
+                </x-slot>
+            </x-core::button>
         </div>
     </div>
 </div>
