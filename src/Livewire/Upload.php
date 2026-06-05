@@ -90,10 +90,9 @@ class Upload extends Component
     public function downloadTemplate()
     {
         TenantConnectionService::ensureActive();
+        
         $disk = app()->isProduction() ? 's3' : 'local';
-
-        // cek jika s3 maka harus menggunakan class \Bale\Core\Support\Cdn::url
-        $slug = app()->isProduction() ? Cdn::prefix() . "/" . session('bale_active_slug') : session('bale_active_slug');
+        $slug = session('bale_active_slug');
         $path = $slug . '/ikm/template_ikm_standar.xlsx';
 
         if (!Storage::disk($disk)->exists($path)) {
