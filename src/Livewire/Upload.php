@@ -2,6 +2,7 @@
 
 namespace Bale\Ikm\Livewire;
 
+use Bale\Core\Support\Cdn;
 use Bale\Ikm\Models\IkmBatch;
 use Bale\Ikm\Services\IkmImportService;
 use Illuminate\Support\Facades\Auth;
@@ -90,7 +91,9 @@ class Upload extends Component
     {
         TenantConnectionService::ensureActive();
         $disk = app()->isProduction() ? 's3' : 'local';
-        $slug = session('bale_active_slug');
+
+        // cek jika s3 maka harus menggunakan class \Bale\Core\Support\Cdn::url
+        $slug = app()->isProduction() ? Cdn::prefix() . "/" . session('bale_active_slug') : session('bale_active_slug');
         $path = $slug . '/ikm/template_ikm_standar.xlsx';
 
         if (!Storage::disk($disk)->exists($path)) {
