@@ -15,7 +15,11 @@ class BatchTable extends Component
         TenantConnectionService::ensureActive();
         $batch = IkmBatch::findOrFail($id);
         $this->authorize('delete', $batch);
-        $batch->delete();
+
+        $batch->getConnection()->transaction(function () use ($batch) {
+            $batch->delete();
+        });
+
         $this->dispatch('toast', message: 'Batch berhasil dihapus.', type: 'success');
     }
 

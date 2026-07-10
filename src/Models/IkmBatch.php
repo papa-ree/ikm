@@ -37,6 +37,13 @@ class IkmBatch extends Model
         'approved_at' => 'datetime',
     ];
 
+    protected static function booted()
+    {
+        static::deleting(function (IkmBatch $batch) {
+            $batch->records()->delete();
+        });
+    }
+
     // ─────────────────────────────────────────────
     // Accessors
     // ─────────────────────────────────────────────
