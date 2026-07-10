@@ -6,6 +6,7 @@ use Bale\Ikm\Livewire\Overview;
 use Bale\Ikm\Livewire\Batch;
 use Bale\Ikm\Livewire\Detail;
 use Bale\Ikm\Livewire\Setting;
+use Bale\Ikm\Livewire\Trash;
 use Bale\Ikm\Livewire\Upload;
 use Illuminate\Support\Facades\Route;
 
@@ -29,6 +30,9 @@ Route::middleware(['web', 'auth'])->prefix('cms/ikm')->name('ikm.')->group(funct
         // Riwayat & Detail Batch
         Route::get('/batches', Batch\Index::class)->middleware('permission:ikm.view')->name('list');
         Route::get('/batches/{id}', Detail\Index::class)->middleware('permission:ikm.view')->name('detail');
+
+        // Trash Batch IKM (harus setelah named routes, sebelum wildcard {id} jika ada)
+        Route::get('/batches-trash', Trash\Index::class)->middleware('permission:ikm.delete')->name('trash');
 
         // Import Data IKM
         Route::get('/upload', Upload::class)->middleware('permission:ikm.upload')->name('upload');

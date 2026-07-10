@@ -39,8 +39,16 @@ class IkmBatch extends Model
 
     protected static function booted()
     {
+        // Soft delete: ikut soft-delete semua records
         static::deleting(function (IkmBatch $batch) {
-            $batch->records()->delete();
+            if (!$batch->isForceDeleting()) {
+                $batch->records()->delete();
+            }
+        });
+
+        // Force delete (hapus permanen): hapus semua records secara permanen
+        static::forceDeleting(function (IkmBatch $batch) {
+            $batch->records()->withTrashed()->forceDelete();
         });
     }
 

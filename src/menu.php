@@ -8,7 +8,7 @@ return [
         'url' => 'ikm/overview',
         'icon' => 'bar-chart-3',
         'permission' => \Bale\Ikm\IkmPermissions::VIEW_IKM,
-        'table'      => 'ikm_batches',
+        'table' => 'ikm_batches',
     ],
     [
         'id' => 'ikm-list',
@@ -17,7 +17,7 @@ return [
         'url' => 'ikm/batches',
         'icon' => 'list-ordered',
         'permission' => \Bale\Ikm\IkmPermissions::VIEW_IKM,
-        'table'      => 'ikm_batches',
+        'table' => 'ikm_batches',
     ],
     [
         'id' => 'ikm-upload',
@@ -26,7 +26,7 @@ return [
         'url' => 'ikm/upload',
         'icon' => 'upload-cloud',
         'permission' => \Bale\Ikm\IkmPermissions::UPLOAD_IKM,
-        'table'      => 'ikm_batches',
+        'table' => 'ikm_batches',
     ],
     [
         'id' => 'ikm-settings',
@@ -35,6 +35,16 @@ return [
         'url' => 'ikm/settings',
         'icon' => 'settings-2',
         'permission' => \Bale\Ikm\IkmPermissions::MANAGE_SETTINGS,
-        'table'      => 'ikm_settings',
+        'table' => 'ikm_settings',
+    ],
+    // trash
+    [
+        'id' => 'ikm-trash',
+        'group' => 'ikm',
+        'label' => 'Trash',
+        'url' => 'ikm/batches-trash',
+        'icon' => 'trash-2',
+        'permission' => \Bale\Ikm\IkmPermissions::DELETE_IKM,
+        'table' => 'ikm_batches',
     ],
 ];

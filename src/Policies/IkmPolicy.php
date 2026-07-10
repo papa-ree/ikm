@@ -58,6 +58,22 @@ class IkmPolicy
     }
 
     /**
+     * Boleh memulihkan (restore) batch dari trash.
+     */
+    public function restore(Authenticatable $user, IkmBatch $batch): bool
+    {
+        return $this->hasPermission($user, IkmPermissions::DELETE_IKM);
+    }
+
+    /**
+     * Boleh menghapus batch secara permanen (force delete).
+     */
+    public function forceDelete(Authenticatable $user, IkmBatch $batch): bool
+    {
+        return $this->hasPermission($user, IkmPermissions::DELETE_IKM);
+    }
+
+    /**
      * Boleh menyetujui / memfinalisasi batch IKM.
      * Hanya berlaku untuk batch yang masih berstatus 'selesai' (belum approved).
      */
