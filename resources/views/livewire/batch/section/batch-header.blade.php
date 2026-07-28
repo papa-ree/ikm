@@ -7,7 +7,7 @@
             </x-slot>
         </x-core::button>
         @endcan --}}
-        @can('create', \Bale\Ikm\Models\IkmBatch::class)
+        @can(\Bale\Ikm\IkmPermissions::UPLOAD_IKM)
             <x-core::button link href="{{ route('ikm.upload') }}" label="Import Batch Baru">
                 <x-slot name="icon">
                     <x-lucide-plus-circle class="w-5 h-5" />

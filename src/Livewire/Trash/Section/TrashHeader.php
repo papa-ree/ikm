@@ -3,6 +3,7 @@
 namespace Bale\Ikm\Livewire\Trash\Section;
 
 use Bale\Cms\Services\TenantConnectionService;
+use Bale\Ikm\IkmPermissions;
 use Bale\Ikm\Models\IkmBatch;
 use Livewire\Component;
 
@@ -11,7 +12,7 @@ class TrashHeader extends Component
     public function emptyTrash(): void
     {
         TenantConnectionService::ensureActive();
-        $this->authorize('delete', IkmBatch::class);
+        $this->authorize(IkmPermissions::DELETE_IKM);
 
         IkmBatch::onlyTrashed()
             ->get()

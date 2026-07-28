@@ -3,6 +3,7 @@
 namespace Bale\Ikm\Livewire\Detail;
 
 use Bale\Cms\Services\TenantConnectionService;
+use Bale\Ikm\IkmPermissions;
 use Bale\Ikm\Models\IkmBatch;
 use Bale\Ikm\Models\IkmRecord;
 use Livewire\Attributes\Layout;
@@ -19,7 +20,7 @@ class Index extends Component
     {
         TenantConnectionService::ensureActive();
         $this->batch = IkmBatch::findOrFail($id);
-        $this->authorize('view', $this->batch);
+        $this->authorize(IkmPermissions::VIEW_IKM);
     }
 
     public function render()

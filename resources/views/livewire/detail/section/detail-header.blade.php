@@ -79,7 +79,7 @@
 
             {{-- Right: Actions --}}
             <div class="flex flex-wrap items-center gap-2 shrink-0 lg:pt-1">
-                @can('ikm.approve')
+                @can(\Bale\Ikm\IkmPermissions::APPROVE_IKM)
                 <button wire:click="recalculate"
                     wire:loading.attr="disabled"
                     class="group inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur-sm ring-1 ring-white/20 text-sm font-semibold text-white transition-all shadow-sm disabled:opacity-60">
@@ -88,7 +88,7 @@
                 </button>
                 @endcan
 
-                @can('ikm.export')
+                @can(\Bale\Ikm\IkmPermissions::EXPORT_IKM)
                 <button wire:click="exportExcel"
                     wire:loading.attr="disabled"
                     class="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-purple-700 font-semibold text-sm hover:bg-white/90 transition-all shadow-md hover:shadow-lg disabled:opacity-60">

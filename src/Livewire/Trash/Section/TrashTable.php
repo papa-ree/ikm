@@ -3,6 +3,7 @@
 namespace Bale\Ikm\Livewire\Trash\Section;
 
 use Bale\Cms\Services\TenantConnectionService;
+use Bale\Ikm\IkmPermissions;
 use Bale\Ikm\Models\IkmBatch;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -47,7 +48,7 @@ class TrashTable extends Component
         TenantConnectionService::ensureActive();
 
         $batch = IkmBatch::onlyTrashed()->findOrFail($id);
-        $this->authorize('delete', $batch);
+        $this->authorize(IkmPermissions::DELETE_IKM);
 
         // Restore batch & records terkait
         $batch->getConnection()->transaction(function () use ($batch) {
@@ -66,7 +67,7 @@ class TrashTable extends Component
         TenantConnectionService::ensureActive();
 
         $batch = IkmBatch::onlyTrashed()->findOrFail($id);
-        $this->authorize('delete', $batch);
+        $this->authorize(IkmPermissions::DELETE_IKM);
 
         // forceDelete akan memicu event `forceDeleting` di IkmBatch::booted()
         // yang akan menghapus records secara permanen juga.

@@ -3,6 +3,7 @@
 namespace Bale\Ikm\Livewire;
 
 use Bale\Cms\Services\TenantConnectionService;
+use Bale\Ikm\IkmPermissions;
 use Bale\Ikm\Models\IkmBatch;
 use Bale\Ikm\Services\IkmImportService;
 use Illuminate\Support\Facades\Auth;
@@ -49,7 +50,7 @@ class Upload extends Component
     public function save(IkmImportService $importService): void
     {
         TenantConnectionService::ensureActive();
-        Gate::authorize('create', IkmBatch::class);
+        Gate::authorize(IkmPermissions::UPLOAD_IKM);
 
         $this->validate();
 

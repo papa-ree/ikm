@@ -3,6 +3,7 @@
 namespace Bale\Ikm\Livewire\Batch\Section;
 
 use Bale\Cms\Services\TenantConnectionService;
+use Bale\Ikm\IkmPermissions;
 use Bale\Ikm\Models\IkmBatch;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
@@ -13,7 +14,7 @@ class BatchTable extends Component
     {
         TenantConnectionService::ensureActive();
         $batch = IkmBatch::findOrFail($id);
-        $this->authorize('delete', $batch);
+        $this->authorize(IkmPermissions::DELETE_IKM);
 
         $batch->getConnection()->transaction(function () use ($batch) {
             $batch->delete();
@@ -26,7 +27,7 @@ class BatchTable extends Component
     {
         TenantConnectionService::ensureActive();
         $batch = IkmBatch::findOrFail($id);
-        $this->authorize('approve', $batch);
+        $this->authorize(IkmPermissions::APPROVE_IKM);
 
         $batch->update([
             'status' => 'selesai',
