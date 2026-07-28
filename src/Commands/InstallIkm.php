@@ -61,6 +61,7 @@ class InstallIkm extends Command
                 case 'Exit':
                 case 4:
                     $this->info('Exit installation.');
+
                     return self::SUCCESS;
             }
 
@@ -72,7 +73,8 @@ class InstallIkm extends Command
 
         } catch (Throwable $e) {
             $this->newLine();
-            $this->error('  [ERROR] Installation failed: ' . $e->getMessage());
+            $this->error('  [ERROR] Installation failed: '.$e->getMessage());
+
             return self::FAILURE;
         }
     }
@@ -109,14 +111,14 @@ class InstallIkm extends Command
 
         // Role 1: Admin Pusat — semua permission IKM
         $adminPusat = Role::firstOrCreate(
-            ['name'       => 'ikm-admin-pusat'],
+            ['name' => 'ikm-admin-pusat'],
             ['guard_name' => 'web'],
         );
         $adminPusat->syncPermissions(IkmPermissions::ALL);
 
         // Role 2: Admin OPD — permission terbatas
         $adminOpd = Role::firstOrCreate(
-            ['name'       => 'ikm-admin-opd'],
+            ['name' => 'ikm-admin-opd'],
             ['guard_name' => 'web'],
         );
         $adminOpd->syncPermissions(IkmPermissions::OPD);

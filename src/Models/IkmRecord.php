@@ -2,17 +2,19 @@
 
 namespace Bale\Ikm\Models;
 
+use Bale\Cms\Traits\UsesTenantConnection;
+use Bale\Core\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Bale\Cms\Traits\UsesTenantConnection;
 
 class IkmRecord extends Model
 {
-    use UsesTenantConnection;
     use HasUuids;
+    use LogsActivity;
     use SoftDeletes;
+    use UsesTenantConnection;
 
     protected $table = 'ikm_records';
 
@@ -101,7 +103,7 @@ class IkmRecord extends Model
                 $result = [];
 
                 foreach ($unsurConfig as $key => $label) {
-                    $column = 'nrr_' . $key; // nrr_u1, nrr_u2, ...
+                    $column = 'nrr_'.$key; // nrr_u1, nrr_u2, ...
                     $result[$label] = $this->$column;
                 }
 
@@ -118,7 +120,7 @@ class IkmRecord extends Model
     protected function demografiRingkas(): Attribute
     {
         return Attribute::make(
-            get: fn() => [
+            get: fn () => [
                 'jenis_kelamin' => [
                     'Laki-laki' => $this->dem_laki,
                     'Perempuan' => $this->dem_perempuan,
@@ -174,6 +176,6 @@ class IkmRecord extends Model
      */
     public function scopeByOPD($query, string $namaOpd)
     {
-        return $query->where('nama_opd', 'like', '%' . $namaOpd . '%');
+        return $query->where('nama_opd', 'like', '%'.$namaOpd.'%');
     }
 }

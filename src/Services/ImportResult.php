@@ -9,9 +9,9 @@ namespace Bale\Ikm\Services;
 readonly class ImportResult
 {
     /**
-     * @param  int    $success  Jumlah baris OPD yang berhasil diimport
-     * @param  int    $failed   Jumlah baris OPD yang gagal diimport
-     * @param  array  $errors   Detail error per baris: ['row' => int, 'opd' => string, 'message' => string]
+     * @param  int  $success  Jumlah baris OPD yang berhasil diimport
+     * @param  int  $failed  Jumlah baris OPD yang gagal diimport
+     * @param  array  $errors  Detail error per baris: ['row' => int, 'opd' => string, 'message' => string]
      */
     public function __construct(
         public int $success,
@@ -44,8 +44,8 @@ readonly class ImportResult
 
         foreach ($this->errors as $err) {
             $baris = $err['row'] ?? '?';
-            $opd   = $err['opd'] ?? '-';
-            $msg   = $err['message'] ?? 'Unknown error';
+            $opd = $err['opd'] ?? '-';
+            $msg = $err['message'] ?? 'Unknown error';
             $lines[] = "  [Baris {$baris}] {$opd}: {$msg}";
         }
 

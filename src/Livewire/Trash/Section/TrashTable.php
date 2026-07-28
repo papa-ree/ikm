@@ -2,9 +2,8 @@
 
 namespace Bale\Ikm\Livewire\Trash\Section;
 
-use Bale\Ikm\IkmPermissions;
-use Bale\Ikm\Models\IkmBatch;
 use Bale\Cms\Services\TenantConnectionService;
+use Bale\Ikm\Models\IkmBatch;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -14,13 +13,15 @@ class TrashTable extends Component
     use WithPagination;
 
     public string $search = '';
+
     public string $filterTriwulan = '';
+
     public string $filterTahun = '';
 
     protected $queryString = [
-        'search'         => ['except' => ''],
+        'search' => ['except' => ''],
         'filterTriwulan' => ['except' => '', 'as' => 'tw'],
-        'filterTahun'    => ['except' => '', 'as' => 'tahun'],
+        'filterTahun' => ['except' => '', 'as' => 'tahun'],
     ];
 
     public function updatingSearch(): void
@@ -93,12 +94,12 @@ class TrashTable extends Component
 
         $batches = IkmBatch::onlyTrashed()
             ->with(['uploadedBy:id,name'])
-            ->when($this->search, fn($q) => $q->where(function ($q) {
-                $q->where('nama', 'like', '%' . $this->search . '%')
-                  ->orWhere('nama_file', 'like', '%' . $this->search . '%');
+            ->when($this->search, fn ($q) => $q->where(function ($q) {
+                $q->where('nama', 'like', '%'.$this->search.'%')
+                    ->orWhere('nama_file', 'like', '%'.$this->search.'%');
             }))
-            ->when($this->filterTriwulan, fn($q) => $q->where('triwulan', $this->filterTriwulan))
-            ->when($this->filterTahun, fn($q) => $q->where('tahun', $this->filterTahun))
+            ->when($this->filterTriwulan, fn ($q) => $q->where('triwulan', $this->filterTriwulan))
+            ->when($this->filterTahun, fn ($q) => $q->where('tahun', $this->filterTahun))
             ->orderBy('deleted_at', 'desc')
             ->paginate(20);
 

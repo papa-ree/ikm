@@ -2,9 +2,9 @@
 
 namespace Bale\Ikm\Commands;
 
-use Bale\Ikm\Models\IkmSetting;
 use Bale\Cms\Models\BaleList;
 use Bale\Cms\Services\TenantManager;
+use Bale\Ikm\Models\IkmSetting;
 use Illuminate\Console\Command;
 use Throwable;
 
@@ -18,10 +18,11 @@ class SeedIkm extends Command
     {
         $tenantSlug = $this->option('tenant');
 
-        if (!$tenantSlug) {
+        if (! $tenantSlug) {
             $tenants = BaleList::all();
             if ($tenants->isEmpty()) {
                 $this->error('No tenants found in bale_lists table.');
+
                 return self::FAILURE;
             }
 
@@ -33,13 +34,13 @@ class SeedIkm extends Command
 
         try {
             $tenant = BaleList::where('slug', $tenantSlug)->firstOrFail();
-            
+
             // Initialize tenant connection specifically for CLI
             $this->info("Initializing connection for tenant: {$tenant->slug}");
             TenantManager::initializeFromBaleUuid($tenant->id);
             $connection = TenantManager::getActiveConnection();
 
-            if (!$connection) {
+            if (! $connection) {
                 throw new \Exception("Failed to activate connection for tenant {$tenant->slug}");
             }
 
@@ -51,7 +52,8 @@ class SeedIkm extends Command
 
             return self::SUCCESS;
         } catch (Throwable $e) {
-            $this->error("Seeding failed: " . $e->getMessage());
+            $this->error('Seeding failed: '.$e->getMessage());
+
             return self::FAILURE;
         }
     }
@@ -59,18 +61,18 @@ class SeedIkm extends Command
     protected function seedSettings(string $connection): int
     {
         $kategori = config('ikm.kategori', []);
-        $count    = 0;
+        $count = 0;
 
         foreach ($kategori as $kode => $values) {
             $kodeLC = strtolower($kode); // 'A' → 'a'
 
             $entries = [
-                "kategori_{$kodeLC}_min"   => [
+                "kategori_{$kodeLC}_min" => [
                     'value' => (string) $values['min'],
                     'label' => "Batas Bawah Kategori {$kode}",
                     'group' => 'kategori',
                 ],
-                "kategori_{$kodeLC}_max"   => [
+                "kategori_{$kodeLC}_max" => [
                     'value' => (string) $values['max'],
                     'label' => "Batas Atas Kategori {$kode}",
                     'group' => 'kategori',

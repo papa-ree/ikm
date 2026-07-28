@@ -2,32 +2,27 @@
 
 namespace Bale\Ikm\Livewire\Detail\Section;
 
-use Bale\Ikm\Models\IkmBatch;
-use Bale\Ikm\IkmPermissions;
 use Bale\Cms\Services\TenantConnectionService;
-use Illuminate\Support\Facades\Auth;
-use Livewire\Component;
-use Bale\Ikm\Services\IkmCalculatorService;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+use Bale\Ikm\IkmPermissions;
+use Bale\Ikm\Models\IkmBatch;
 use Bale\Ikm\Models\IkmRecord;
+use Bale\Ikm\Services\IkmCalculatorService;
+use Livewire\Component;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DetailHeader extends Component
 {
     public IkmBatch $batch;
-    public bool $canExport      = false;
-    public bool $canRecalculate = false;
 
-    public function mount(IkmBatch $batch, bool $canExport, bool $canRecalculate): void
+    public function mount(IkmBatch $batch): void
     {
-        $this->batch          = $batch;
-        $this->canExport      = $canExport;
-        $this->canRecalculate = $canRecalculate;
+        $this->batch = $batch;
     }
 
     public function recalculate(IkmCalculatorService $calculator): void
     {
         TenantConnectionService::ensureActive();
-        $this->authorize('approve', $this->batch);
+        $this->authorize(IkmPermissions::APPROVE_IKM);
         $calculator->recalculateBatch($this->batch);
         $this->dispatch('toast', message: 'Kalkulasi ulang berhasil.', type: 'success');
     }
@@ -35,9 +30,9 @@ class DetailHeader extends Component
     public function exportExcel(): StreamedResponse
     {
         TenantConnectionService::ensureActive();
-        $this->authorize('export', $this->batch);
+        $this->authorize(IkmPermissions::EXPORT_IKM);
 
-        $records  = IkmRecord::query()
+        $records = IkmRecord::query()
             ->where('ikm_batch_id', $this->batch->id)
             ->orderBy('nama_opd')
             ->get();

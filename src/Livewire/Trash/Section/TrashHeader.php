@@ -2,8 +2,8 @@
 
 namespace Bale\Ikm\Livewire\Trash\Section;
 
-use Bale\Ikm\Models\IkmBatch;
 use Bale\Cms\Services\TenantConnectionService;
+use Bale\Ikm\Models\IkmBatch;
 use Livewire\Component;
 
 class TrashHeader extends Component
@@ -15,7 +15,7 @@ class TrashHeader extends Component
 
         IkmBatch::onlyTrashed()
             ->get()
-            ->each(fn($batch) => $batch->forceDelete());
+            ->each(fn ($batch) => $batch->forceDelete());
 
         $this->dispatch('toast', message: 'Trash berhasil dikosongkan.', type: 'success');
         $this->dispatch('trash-emptied');

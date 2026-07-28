@@ -17,10 +17,11 @@ class MigrateIkm extends Command
     {
         $tenantSlug = $this->option('tenant');
 
-        if (!$tenantSlug) {
+        if (! $tenantSlug) {
             $tenants = BaleList::all();
             if ($tenants->isEmpty()) {
                 $this->error('No tenants found in bale_lists table.');
+
                 return self::FAILURE;
             }
 
@@ -39,7 +40,7 @@ class MigrateIkm extends Command
             TenantManager::initializeFromBaleUuid($tenant->id);
             $connection = TenantManager::getActiveConnection();
 
-            if (!$connection) {
+            if (! $connection) {
                 throw new \Exception("Failed to activate connection for tenant {$tenant->slug}");
             }
 
@@ -56,7 +57,8 @@ class MigrateIkm extends Command
 
             return self::SUCCESS;
         } catch (Throwable $e) {
-            $this->error("Migration failed: " . $e->getMessage());
+            $this->error('Migration failed: '.$e->getMessage());
+
             return self::FAILURE;
         }
     }

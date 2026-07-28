@@ -2,9 +2,8 @@
 
 namespace Bale\Ikm\Livewire\Batch\Section;
 
-use Bale\Ikm\IkmPermissions;
-use Bale\Ikm\Models\IkmBatch;
 use Bale\Cms\Services\TenantConnectionService;
+use Bale\Ikm\Models\IkmBatch;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
@@ -30,7 +29,7 @@ class BatchTable extends Component
         $this->authorize('approve', $batch);
 
         $batch->update([
-            'status'      => 'selesai',
+            'status' => 'selesai',
             'approved_by' => Auth::id(),
             'approved_at' => now(),
         ]);
@@ -42,6 +41,7 @@ class BatchTable extends Component
     public function render()
     {
         $tahunOptions = range(2020, (int) now()->format('Y'));
+
         return view('ikm::livewire.batch.section.batch-table', compact('tahunOptions'));
     }
 }

@@ -2,17 +2,20 @@
 
 namespace Bale\Ikm\Models;
 
+use App\Models\User;
+use Bale\Cms\Traits\UsesTenantConnection;
+use Bale\Core\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Bale\Cms\Traits\UsesTenantConnection;
 
 class IkmBatch extends Model
 {
-    use UsesTenantConnection;
     use HasUuids;
+    use LogsActivity;
     use SoftDeletes;
+    use UsesTenantConnection;
 
     protected $table = 'ikm_batches';
 
@@ -41,7 +44,7 @@ class IkmBatch extends Model
     {
         // Soft delete: ikut soft-delete semua records
         static::deleting(function (IkmBatch $batch) {
-            if (!$batch->isForceDeleting()) {
+            if (! $batch->isForceDeleting()) {
                 $batch->records()->delete();
             }
         });
@@ -62,7 +65,7 @@ class IkmBatch extends Model
     protected function labelTriwulan(): Attribute
     {
         return Attribute::make(
-            get: fn() => "Triwulan {$this->triwulan} {$this->tahun}",
+            get: fn () => "Triwulan {$this->triwulan} {$this->tahun}",
         );
     }
 
@@ -108,7 +111,7 @@ class IkmBatch extends Model
     public function uploadedBy()
     {
         return $this->belongsTo(
-            config('auth.providers.users.model', \App\Models\User::class),
+            config('auth.providers.users.model', User::class),
             'uploaded_by'
         );
     }
@@ -119,7 +122,7 @@ class IkmBatch extends Model
     public function approvedBy()
     {
         return $this->belongsTo(
-            config('auth.providers.users.model', \App\Models\User::class),
+            config('auth.providers.users.model', User::class),
             'approved_by'
         );
     }

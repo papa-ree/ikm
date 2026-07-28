@@ -2,9 +2,9 @@
 
 use Bale\Cms\Middleware\EnsureBaleSelected;
 use Bale\Cms\Middleware\SwitchBaleConnection;
-use Bale\Ikm\Livewire\Overview;
 use Bale\Ikm\Livewire\Batch;
 use Bale\Ikm\Livewire\Detail;
+use Bale\Ikm\Livewire\Overview;
 use Bale\Ikm\Livewire\Setting;
 use Bale\Ikm\Livewire\Trash;
 use Bale\Ikm\Livewire\Upload;

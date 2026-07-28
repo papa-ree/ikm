@@ -2,12 +2,11 @@
 
 namespace Bale\Ikm\Livewire\Detail;
 
-use Bale\Ikm\IkmPermissions;
+use Bale\Cms\Services\TenantConnectionService;
 use Bale\Ikm\Models\IkmBatch;
 use Bale\Ikm\Models\IkmRecord;
-use Bale\Cms\Services\TenantConnectionService;
-use Illuminate\Support\Facades\Auth;
-use Livewire\Attributes\{Layout, Title};
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('cms::layouts.app')]
@@ -32,37 +31,32 @@ class Index extends Component
 
         $demJK = [
             'Laki-laki' => $allRecords->sum('dem_laki'),
-            'Perempuan'  => $allRecords->sum('dem_perempuan'),
+            'Perempuan' => $allRecords->sum('dem_perempuan'),
         ];
         $demPendidikan = [
-            'SD'      => $allRecords->sum('dem_sd'),
-            'SLTP'    => $allRecords->sum('dem_sltp'),
-            'SLTA'    => $allRecords->sum('dem_slta'),
+            'SD' => $allRecords->sum('dem_sd'),
+            'SLTP' => $allRecords->sum('dem_sltp'),
+            'SLTA' => $allRecords->sum('dem_slta'),
             'Diploma' => $allRecords->sum('dem_diploma'),
-            'S1'      => $allRecords->sum('dem_s1'),
-            'S2'      => $allRecords->sum('dem_s2'),
-            'S3'      => $allRecords->sum('dem_s3'),
+            'S1' => $allRecords->sum('dem_s1'),
+            'S2' => $allRecords->sum('dem_s2'),
+            'S3' => $allRecords->sum('dem_s3'),
         ];
         $demPekerjaan = [
-            'PNS/ASN'    => $allRecords->sum('dem_pns'),
-            'TNI/Polri'  => $allRecords->sum('dem_tni_polri'),
-            'Swasta'     => $allRecords->sum('dem_swasta'),
+            'PNS/ASN' => $allRecords->sum('dem_pns'),
+            'TNI/Polri' => $allRecords->sum('dem_tni_polri'),
+            'Swasta' => $allRecords->sum('dem_swasta'),
             'Wiraswasta' => $allRecords->sum('dem_wiraswasta'),
-            'Pelajar'    => $allRecords->sum('dem_pelajar'),
-            'Petani'     => $allRecords->sum('dem_petani'),
-            'Lainnya'    => $allRecords->sum('dem_lainnya'),
+            'Pelajar' => $allRecords->sum('dem_pelajar'),
+            'Petani' => $allRecords->sum('dem_petani'),
+            'Lainnya' => $allRecords->sum('dem_lainnya'),
         ];
-
-        $canExport      = Auth::user()?->can(IkmPermissions::EXPORT_IKM);
-        $canRecalculate = Auth::user()?->can(IkmPermissions::APPROVE_IKM);
 
         return view('ikm::livewire.detail.index', compact(
             'totalSampel',
             'demJK',
             'demPendidikan',
             'demPekerjaan',
-            'canExport',
-            'canRecalculate',
         ));
     }
 }

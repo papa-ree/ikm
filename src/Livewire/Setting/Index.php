@@ -2,13 +2,13 @@
 
 namespace Bale\Ikm\Livewire\Setting;
 
+use Bale\Cms\Services\TenantConnectionService;
 use Bale\Ikm\IkmPermissions;
 use Bale\Ikm\Models\IkmSetting;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-use Bale\Cms\Services\TenantConnectionService;
 
 #[Layout('cms::layouts.app')]
 #[Title('Pengaturan Kategori IKM')]
@@ -94,6 +94,7 @@ class Index extends Component
             $rules["kategori.{$kode}.min"] = 'required|numeric|min:0|max:100';
             $rules["kategori.{$kode}.max"] = 'required|numeric|min:0|max:100';
         }
+
         return $rules;
     }
 
@@ -114,6 +115,7 @@ class Index extends Component
 
         if ($this->getErrorBag()->isNotEmpty()) {
             $this->dispatch('validation-failed');
+
             return;
         }
     }

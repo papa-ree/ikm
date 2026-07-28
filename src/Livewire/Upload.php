@@ -2,7 +2,7 @@
 
 namespace Bale\Ikm\Livewire;
 
-use Bale\Core\Support\Cdn;
+use Bale\Cms\Services\TenantConnectionService;
 use Bale\Ikm\Models\IkmBatch;
 use Bale\Ikm\Services\IkmImportService;
 use Illuminate\Support\Facades\Auth;
@@ -13,7 +13,6 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 use Livewire\WithFileUploads;
-use Bale\Cms\Services\TenantConnectionService;
 
 #[Layout('cms::layouts.app')]
 #[Title('Upload IKM')]
@@ -90,13 +89,14 @@ class Upload extends Component
     public function downloadTemplate()
     {
         TenantConnectionService::ensureActive();
-        
+
         $disk = app()->isProduction() ? 's3' : 'local';
         $slug = session('bale_active_slug');
-        $path = $slug . '/ikm/template_ikm_standar.xlsx';
+        $path = $slug.'/ikm/template_ikm_standar.xlsx';
 
-        if (!Storage::disk($disk)->exists($path)) {
+        if (! Storage::disk($disk)->exists($path)) {
             $this->dispatch('toast', message: 'Template belum diunggah oleh admin.', type: 'warning');
+
             return null;
         }
 

@@ -21,13 +21,13 @@ class IkmServiceProvider extends ServiceProvider
 {
     /**
      * Method register()
-     * 
+     *
      * Digunakan untuk mendaftarkan service, binding, atau command
      * ke dalam service container Laravel.
      */
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/ikm.php', 'ikm');
+        $this->mergeConfigFrom(__DIR__.'/../config/ikm.php', 'ikm');
         $this->registerServices();
         $this->registerCommands();
     }
@@ -53,7 +53,7 @@ class IkmServiceProvider extends ServiceProvider
             'command.ikm:install' => InstallIkm::class,
             'command.ikm:publish' => PublishIkmCommand::class,
             'command.ikm:migrate' => MigrateIkm::class,
-            'command.ikm:seed'    => SeedIkm::class,
+            'command.ikm:seed' => SeedIkm::class,
         ];
 
         foreach ($commands as $key => $class) {
@@ -65,7 +65,7 @@ class IkmServiceProvider extends ServiceProvider
 
     /**
      * Method boot()
-     * 
+     *
      * Dipanggil setelah semua service diregistrasi.
      * Digunakan untuk load resource seperti:
      * - view
@@ -76,7 +76,7 @@ class IkmServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->app->booted(function () {
-            $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
+            $this->loadRoutesFrom(__DIR__.'/../routes/web.php');
         });
 
         $this->registerViews();
@@ -96,19 +96,19 @@ class IkmServiceProvider extends ServiceProvider
 
     /**
      * Load migration langsung dari package.
-     * 
+     *
      * Dengan ini, user bisa langsung menjalankan migration
      * tanpa harus publish file ke aplikasi utama.
      */
     protected function loadMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
 
     protected function registerViews(): void
     {
         $this->loadViewsFrom(
-            __DIR__ . '/../resources/views',
+            __DIR__.'/../resources/views',
             'ikm'
         );
     }
@@ -118,13 +118,13 @@ class IkmServiceProvider extends ServiceProvider
      */
     protected function offerPublishing(): void
     {
-        if (!$this->app->runningInConsole()) {
+        if (! $this->app->runningInConsole()) {
             return;
         }
 
         // Publish config
         $this->publishes([
-            __DIR__ . '/../config/ikm.php' => config_path('ikm.php'),
+            __DIR__.'/../config/ikm.php' => config_path('ikm.php'),
         ], 'ikm:config');
 
         $this->publishes($this->getMigrations(), 'ikm:migrations');
@@ -136,15 +136,15 @@ class IkmServiceProvider extends ServiceProvider
     protected function getMigrations(): array
     {
         $migrations = [];
-        $sourcePath = __DIR__ . '/../database/migrations/';
+        $sourcePath = __DIR__.'/../database/migrations/';
 
         // Pastikan direktori ada
-        if (!is_dir($sourcePath)) {
+        if (! is_dir($sourcePath)) {
             return $migrations;
         }
 
         // Loop semua file migration (baik .php maupun .stub)
-        foreach (glob($sourcePath . '*.{php,stub}', GLOB_BRACE) as $file) {
+        foreach (glob($sourcePath.'*.{php,stub}', GLOB_BRACE) as $file) {
             $filename = basename($file);
 
             // Jika file stub, ganti menjadi nama migration yang benar di aplikasi
@@ -165,33 +165,32 @@ class IkmServiceProvider extends ServiceProvider
         $migrationName = str_replace('.php.stub', '.php', $filename);
         $migrationName = str_replace('.stub', '', $migrationName);
 
-        return database_path('migrations/tenant/' . $migrationName);
+        return database_path('migrations/tenant/'.$migrationName);
     }
 
     /**
      * Registrasi semua Livewire Component yang ada di folder src/Livewire.
-     * 
+     *
      * Mekanisme:
      * - Cari semua file PHP di dalam folder Livewire
      * - Pastikan class tersebut adalah turunan Livewire\Component
      * - Buat alias secara otomatis dari struktur folder
-     * 
+     *
      * Contoh:
      *   src/Livewire/Overview.php
      *     => <livewire:ikm.overview />
-     *
      */
     protected function registerLivewireComponents(): void
     {
-        $namespace = "Bale\\Ikm\\Livewire";
-        $basePath = __DIR__ . "/Livewire";
+        $namespace = 'Bale\\Ikm\\Livewire';
+        $basePath = __DIR__.'/Livewire';
 
         // Jika folder Livewire tidak ada, hentikan proses
-        if (!is_dir($basePath)) {
+        if (! is_dir($basePath)) {
             return;
         }
 
-        $finder = new Finder();
+        $finder = new Finder;
         $finder->files()->in($basePath)->name('*.php');
 
         foreach ($finder as $file) {
@@ -201,24 +200,24 @@ class IkmServiceProvider extends ServiceProvider
             $nsPath = str_replace(['/', '\\'], '\\', $relativePathname);
 
             // Konversi ke FQCN (Fully Qualified Class Name)
-            $class = $namespace . '\\' . Str::beforeLast($nsPath, '.php');
+            $class = $namespace.'\\'.Str::beforeLast($nsPath, '.php');
 
             // Skip jika class tidak ditemukan
-            if (!class_exists($class)) {
+            if (! class_exists($class)) {
                 continue;
             }
 
             // Skip jika bukan turunan Livewire\Component
-            if (!is_subclass_of($class, LivewireComponent::class)) {
+            if (! is_subclass_of($class, LivewireComponent::class)) {
                 continue;
             }
 
             // Buat alias berdasarkan struktur folder (kebab-case)
             $withoutExt = Str::replaceLast('.php', '', $relativePathname);
             $segments = preg_split('#[\\/\\\\]#', $withoutExt);
-            $kebab = array_map(fn($s) => Str::kebab($s), $segments);
+            $kebab = array_map(fn ($s) => Str::kebab($s), $segments);
 
-            $alias = 'ikm.' . implode('.', $kebab);
+            $alias = 'ikm.'.implode('.', $kebab);
 
             // Registrasi komponen ke Livewire
             Livewire::component($alias, $class);

@@ -2,19 +2,21 @@
 
 namespace Bale\Ikm\Livewire;
 
+use Bale\Cms\Services\TenantConnectionService;
 use Bale\Ikm\IkmPermissions;
+use Bale\Ikm\Models\IkmBatch;
 use Bale\Ikm\Models\IkmRecord;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
-use Bale\Cms\Services\TenantConnectionService;
 
 #[Layout('cms::layouts.app')]
 #[Title('Overview IKM')]
 class Overview extends Component
 {
     public int $tahun;
+
     public int $triwulan;
 
     public function mount(): void
@@ -30,12 +32,12 @@ class Overview extends Component
 
         $baseQuery = IkmRecord::query()
             ->with('batch')
-            ->whereHas('batch', fn($q) => $q->whereStatus('selesai')->whereNotNull('approved_at'))
+            ->whereHas('batch', fn ($q) => $q->whereStatus('selesai')->whereNotNull('approved_at'))
             ->where('triwulan', $this->triwulan)
             ->where('tahun', $this->tahun);
 
         // Jika user tidak punya VIEW_ALL_OPD, filter hanya OPD milik user
-        if (!Auth::user()?->can(IkmPermissions::VIEW_ALL_OPD)) {
+        if (! Auth::user()?->can(IkmPermissions::VIEW_ALL_OPD)) {
             $opdUser = config('ikm.opd_user_field')
                 ? Auth::user()->{config('ikm.opd_user_field')}
                 : null;
@@ -58,7 +60,7 @@ class Overview extends Component
         $top5 = $sorted->take(5);
         $bottom5 = $sorted->reverse()->take(5)->values();
         // ── Pending Batches (Global Alert) ────────
-        $pendingBatches = \Bale\Ikm\Models\IkmBatch::query()
+        $pendingBatches = IkmBatch::query()
             ->where('status', 'selesai')
             ->whereNull('approved_at')
             ->count();
@@ -85,6 +87,7 @@ class Overview extends Component
     protected function currentTriwulan(): int
     {
         $month = (int) now()->format('n');
+
         return (int) ceil($month / 3);
     }
 }

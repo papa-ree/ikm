@@ -79,23 +79,23 @@
 
             {{-- Right: Actions --}}
             <div class="flex flex-wrap items-center gap-2 shrink-0 lg:pt-1">
-                @if($canRecalculate)
+                @can('ikm.approve')
                 <button wire:click="recalculate"
                     wire:loading.attr="disabled"
                     class="group inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur-sm ring-1 ring-white/20 text-sm font-semibold text-white transition-all shadow-sm disabled:opacity-60">
                     <x-lucide-refresh-ccw class="w-4 h-4 group-hover:rotate-180 transition-transform duration-700" wire:loading.class="animate-spin" wire:target="recalculate" />
                     Kalkulasi Ulang
                 </button>
-                @endif
+                @endcan
 
-                @if($canExport)
+                @can('ikm.export')
                 <button wire:click="exportExcel"
                     wire:loading.attr="disabled"
                     class="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-purple-700 font-semibold text-sm hover:bg-white/90 transition-all shadow-md hover:shadow-lg disabled:opacity-60">
                     <x-lucide-download class="w-4 h-4 group-hover:translate-y-0.5 transition-transform" wire:loading.class="animate-bounce" wire:target="exportExcel" />
                     Export CSV
                 </button>
-                @endif
+                @endcan
             </div>
         </div>
     </div>

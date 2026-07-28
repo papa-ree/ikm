@@ -2,15 +2,17 @@
 
 namespace Bale\Ikm\Models;
 
-use Illuminate\Support\Collection;
+use Bale\Cms\Traits\UsesTenantConnection;
+use Bale\Core\Traits\LogsActivity;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Bale\Cms\Traits\UsesTenantConnection;
+use Illuminate\Support\Collection;
 
 class IkmSetting extends Model
 {
-    use UsesTenantConnection;
     use HasUuids;
+    use LogsActivity;
+    use UsesTenantConnection;
 
     protected $table = 'ikm_settings';
 
@@ -40,7 +42,7 @@ class IkmSetting extends Model
         }
 
         // Fallback ke config Laravel jika ada
-        return config('ikm.' . $key, $default);
+        return config('ikm.'.$key, $default);
     }
 
     /**
@@ -62,7 +64,7 @@ class IkmSetting extends Model
      *
      * Contoh: IkmSetting::allByGroup('kategori')
      *
-     * @return \Illuminate\Support\Collection<string, static>
+     * @return Collection<string, static>
      */
     public static function allByGroup(string $group): Collection
     {

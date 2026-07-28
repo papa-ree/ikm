@@ -2,7 +2,8 @@
 
 namespace Bale\Ikm\Livewire\Trash;
 
-use Livewire\Attributes\{Layout, Title};
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout('cms::layouts.app')]

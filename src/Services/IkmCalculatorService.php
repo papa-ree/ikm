@@ -2,10 +2,10 @@
 
 namespace Bale\Ikm\Services;
 
+use Bale\Cms\Services\TenantConnectionService;
 use Bale\Ikm\Models\IkmBatch;
 use Bale\Ikm\Models\IkmRecord;
 use Bale\Ikm\Models\IkmSetting;
-use Bale\Cms\Services\TenantConnectionService;
 
 /**
  * Service kalkulasi IKM sesuai PermenPAN-RB No. 14 Tahun 2017.
@@ -36,7 +36,7 @@ class IkmCalculatorService
      * Hitung NRR tertimbang, nilai IKM, dan kategori dari satu baris data OPD.
      *
      * @param  array  $data  Raw data dari satu baris Excel (key → value)
-     * @return array         Data input + hasil kalkulasi
+     * @return array Data input + hasil kalkulasi
      */
     public function calculate(array $data): array
     {
@@ -53,7 +53,7 @@ class IkmCalculatorService
         // 2. Hitung NRR Tertimbang: Σ(nrr_u1..u9) × bobot
         //    Unsur yang null tidak ikut dijumlahkan (dianggap tidak diisi)
         $nrrTertimbang = null;
-        $validValues = array_filter($nrrValues, fn($v) => $v !== null);
+        $validValues = array_filter($nrrValues, fn ($v) => $v !== null);
 
         if (count($validValues) > 0) {
             $nrrTertimbang = round(array_sum($validValues) * $this->bobot, 4);
@@ -71,28 +71,26 @@ class IkmCalculatorService
 
         return array_merge($data, $nrrValues, [
             'nrr_tertimbang' => $nrrTertimbang,
-            'nilai_ikm'      => $nilaiIkm,
-            'kategori'       => $kategoriResult['kode'],
+            'nilai_ikm' => $nilaiIkm,
+            'kategori' => $kategoriResult['kode'],
             'label_kategori' => $kategoriResult['label'],
         ]);
     }
 
     /**
      * Hitung ulang semua records dalam satu batch dan update ke DB.
-     *
-     * @param  IkmBatch  $batch
      */
     public function recalculateBatch(IkmBatch $batch): void
     {
         TenantConnectionService::ensureActive();
         $batch->records()->each(function (IkmRecord $record) {
-            $data   = $record->toArray();
+            $data = $record->toArray();
             $result = $this->calculate($data);
 
             $record->update([
                 'nrr_tertimbang' => $result['nrr_tertimbang'],
-                'nilai_ikm'      => $result['nilai_ikm'],
-                'kategori'       => $result['kategori'],
+                'nilai_ikm' => $result['nilai_ikm'],
+                'kategori' => $result['kategori'],
                 'label_kategori' => $result['label_kategori'],
             ]);
         });
@@ -116,7 +114,7 @@ class IkmCalculatorService
         foreach ($table as $kode => $batas) {
             if ($nilaiIkm >= $batas['min'] && $nilaiIkm <= $batas['max']) {
                 return [
-                    'kode'  => $kode,
+                    'kode' => $kode,
                     'label' => $batas['label'],
                 ];
             }
@@ -139,14 +137,14 @@ class IkmCalculatorService
     protected function buildKategoriTable(): array
     {
         $configTable = config('ikm.kategori', []);
-        $result      = [];
+        $result = [];
 
         foreach ($configTable as $kode => $defaults) {
             $kodeLC = strtolower($kode); // 'A' → 'a'
 
-            $min   = (float) IkmSetting::get("kategori_{$kodeLC}_min",   $defaults['min']);
-            $max   = (float) IkmSetting::get("kategori_{$kodeLC}_max",   $defaults['max']);
-            $label =         IkmSetting::get("kategori_{$kodeLC}_label", $defaults['label']);
+            $min = (float) IkmSetting::get("kategori_{$kodeLC}_min", $defaults['min']);
+            $max = (float) IkmSetting::get("kategori_{$kodeLC}_max", $defaults['max']);
+            $label = IkmSetting::get("kategori_{$kodeLC}_label", $defaults['label']);
 
             $result[$kode] = compact('min', 'max', 'label');
         }

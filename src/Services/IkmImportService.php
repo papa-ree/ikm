@@ -2,13 +2,14 @@
 
 namespace Bale\Ikm\Services;
 
+use Bale\Cms\Services\TenantConnectionService;
 use Bale\Ikm\Models\IkmBatch;
 use Bale\Ikm\Models\IkmRecord;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
-use Bale\Cms\Services\TenantConnectionService;
 use Throwable;
 
 /**
@@ -104,8 +105,7 @@ class IkmImportService
 
     public function __construct(
         protected IkmCalculatorService $calculator,
-    ) {
-    }
+    ) {}
 
     // ─────────────────────────────────────────────
     // Public API
@@ -115,7 +115,6 @@ class IkmImportService
      * Proses import file Excel ke dalam database.
      *
      * @param  IkmBatch  $batch  Batch yang sudah tersimpan dengan path_file terisi
-     * @return ImportResult
      */
     public function import(IkmBatch $batch): ImportResult
     {
@@ -133,9 +132,9 @@ class IkmImportService
             // $filePath = storage_path($batch->path_file);
 
             // jika livewire storage menggunakan local
-            $filePath = \Illuminate\Support\Facades\Storage::disk('local')->path($batch->path_file);
+            $filePath = Storage::disk('local')->path($batch->path_file);
 
-            if (!file_exists($filePath)) {
+            if (! file_exists($filePath)) {
                 throw new \RuntimeException("File tidak ditemukan: {$filePath}");
             }
 
@@ -162,7 +161,7 @@ class IkmImportService
                         'message' => $e->getMessage(),
                     ];
 
-                    Log::warning("[IKM Import] Baris {$rowNumber} gagal: " . $e->getMessage(), [
+                    Log::warning("[IKM Import] Baris {$rowNumber} gagal: ".$e->getMessage(), [
                         'batch_id' => $batch->id,
                         'raw_row' => $rawRow,
                     ]);
@@ -170,7 +169,7 @@ class IkmImportService
             }
 
             // Bulk insert semua record yang berhasil
-            if (!empty($rows)) {
+            if (! empty($rows)) {
                 IkmRecord::insert($rows);
             }
 
@@ -188,8 +187,8 @@ class IkmImportService
                 [
                     'row' => 0,
                     'opd' => '-',
-                    'message' => 'Fatal: ' . $e->getMessage(),
-                ]
+                    'message' => 'Fatal: '.$e->getMessage(),
+                ],
             ]);
 
             $batch->update([
@@ -197,7 +196,7 @@ class IkmImportService
                 'catatan' => $importResult->summary(),
             ]);
 
-            Log::error('[IKM Import] Fatal error: ' . $e->getMessage(), [
+            Log::error('[IKM Import] Fatal error: '.$e->getMessage(), [
                 'batch_id' => $batch->id,
             ]);
         }
@@ -213,7 +212,7 @@ class IkmImportService
      * Ekstrak baris data dari worksheet (mulai row 3, skip header 1 & 2).
      * Stop jika kolom NO kosong atau baris rekapitulasi ("Jumlah").
      *
-     * @return array[]  Array of raw rows (indexed by column index 0-based)
+     * @return array[] Array of raw rows (indexed by column index 0-based)
      */
     protected function extractDataRows(Worksheet $sheet): array
     {
@@ -230,7 +229,7 @@ class IkmImportService
             }
 
             // Skip: kolom NO kosong atau bukan angka
-            if (empty($no) || !is_numeric($no)) {
+            if (empty($no) || ! is_numeric($no)) {
                 continue;
             }
 
@@ -253,7 +252,7 @@ class IkmImportService
      * Petakan raw row (indexed by kolom) ke array key-value sesuai model.
      *
      * @param  array  $rawRow  Raw row dari spreadsheet (0-based index)
-     * @return array           Data siap dikirim ke calculator
+     * @return array Data siap dikirim ke calculator
      */
     protected function mapRowToData(array $rawRow): array
     {
@@ -292,9 +291,7 @@ class IkmImportService
     /**
      * Siapkan array record untuk bulk insert ke tabel ikm_records.
      *
-     * @param  array     $result  Hasil calculate()
-     * @param  IkmBatch  $batch
-     * @return array
+     * @param  array  $result  Hasil calculate()
      */
     protected function prepareRecord(array $result, IkmBatch $batch): array
     {
