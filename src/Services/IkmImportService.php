@@ -220,8 +220,8 @@ class IkmImportService
         $highestRow = $sheet->getHighestDataRow();
 
         for ($rowNum = 3; $rowNum <= $highestRow; $rowNum++) {
-            $no = $sheet->getCellByColumnAndRow(1, $rowNum)->getValue(); // kolom A (1-based)
-            $opd = $sheet->getCellByColumnAndRow(2, $rowNum)->getValue(); // kolom B (1-based)
+            $no = $sheet->getCell([1, $rowNum])->getValue(); // kolom A (1-based)
+            $opd = $sheet->getCell([2, $rowNum])->getValue(); // kolom B (1-based)
 
             // Stop: baris rekapitulasi (NO = null/kosong dan OPD mengandung "Jumlah")
             if (empty($no) && is_string($opd) && Str::contains(strtolower($opd), 'jumlah')) {
@@ -239,7 +239,7 @@ class IkmImportService
 
             for ($col = 0; $col <= $maxCol; $col++) {
                 // PhpSpreadsheet column index adalah 1-based
-                $row[$col] = $sheet->getCellByColumnAndRow($col + 1, $rowNum)->getValue();
+                $row[$col] = $sheet->getCell([$col + 1, $rowNum])->getValue();
             }
 
             $data[] = $row;
